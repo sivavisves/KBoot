@@ -59,3 +59,12 @@ function hour_disection_variance(hour, blocks)
     end
     return hour_1
 end
+
+# get blocks based on index_knn
+function get_blocks(index_knn, blocks)
+    blocks_knn = [];
+    for i in 1:length(index_knn)
+        push!(blocks_knn, blocks[index_knn[i]])
+    end
+    return blocks_knn
+end
