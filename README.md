@@ -1,6 +1,8 @@
 
 <div align="center">
-  <img src="https://github.com/sivavisves/KBoot/blob/main/Images/kboot%20logo.png">
+    <div class="img-sizer" style="width: 750px">
+        <img src="https://github.com/sivavisves/KBoot/blob/main/Images/kboot%20logo.png">
+    </div>
 </div>
 
 # KBOOT: KNN-Bootstrapping Method for Scenario Generation
