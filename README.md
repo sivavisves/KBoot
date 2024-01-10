@@ -1,5 +1,7 @@
 
-![kboot logo](images/kboot_logo.png)
+<div align="center">
+  <img src="https://github.com/sivavisves/KBoot/blob/main/Images/kboot%20logo.png">
+</div>
 
 # KBOOT: KNN-Bootstrapping Method for Scenario Generation
 
