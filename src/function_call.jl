@@ -148,26 +148,26 @@ function get_actual_scenarios(scenarios, event_quantile)
 end
 
 # seperate actual_wind_scenarios into different blocks
-function seperate_blocks(df)
+function seperate_blocks(df, k)
     blocks = []
-    for i in 1:length(wind_scenario_quantile)
+    for i in 1:k
         push!(blocks, filter(row -> row[:block] == i, df))
     end
     return blocks
 end
 
-function plotting_scenarios(scenario_blocks_final, title)
-    x = plot(1:48, scenario_blocks_final[1].BA_total, 
+function plotting_scenarios(scenario_blocks_final, title, horizon)
+    x = plot(1:horizon, scenario_blocks_final[1].BA_total, 
                 color=:black, 
                 alpha=0.5, 
                 linewidth=2, 
                 label="Scenario 1", 
                 title=title, xlabel="Hour", ylabel="Output (MW)", 
                 legend=:outerbottom, legendcolumns=4,
-                xticks=0:4:48)
+                xticks=0:4:horizon)
 
     for i in 2:length(scenario_blocks_final)
-        plot!(1:48, scenario_blocks_final[i].BA_total, alpha=0.5, linewidth=2, label="Scenario $(i)")
+        plot!(1:horizon, scenario_blocks_final[i].BA_total, alpha=0.5, linewidth=2, label="Scenario $(i)")
     end
     return x
 end
