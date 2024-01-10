@@ -1,6 +1,6 @@
 
 <div align="center">
-    <div class="img-sizer" style="width: 750px">
+    <div class="img-sizer" style="width: 500px">
         <img src="https://github.com/sivavisves/KBoot/blob/main/Images/kboot%20logo.png">
     </div>
 </div>
