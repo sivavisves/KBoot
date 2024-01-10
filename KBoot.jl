@@ -85,3 +85,26 @@ load_scenario_quantile = get_blocks(index_quantile, blocks_load_train);
 wind_scenario_variance = get_blocks(index_variance, blocks_wind_train);
 solar_scenario_variance = get_blocks(index_variance, blocks_solar_train);
 load_scenario_variance = get_blocks(index_variance, blocks_load_train);
+
+# loading quantile data
+
+wind_event_quantile = CSV.read("Quantiles/Wind Quantiles.csv", DataFrame);
+solar_event_quantile = CSV.read("Quantiles/Solar Quantiles.csv", DataFrame);
+load_event_quantile = CSV.read("Quantiles/Load Quantiles.csv", DataFrame);
+
+wind_event_quantile = event_quantile_clean(wind_event_quantile);
+solar_event_quantile = event_quantile_clean(solar_event_quantile);
+load_event_quantile = event_quantile_clean(load_event_quantile);
+
+actual_wind_scenarios_variance = get_actual_scenarios(wind_scenario_variance, wind_event_quantile);
+actual_solar_scenarios_variance = get_actual_scenarios(solar_scenario_variance, solar_event_quantile);
+actual_load_scenarios_variance = get_actual_scenarios(load_scenario_variance, load_event_quantile);
+
+wind_scenario_blocks_final_variance = seperate_blocks(actual_wind_scenarios_variance);
+solar_scenario_blocks_final_variance = seperate_blocks(actual_solar_scenarios_variance);
+load_scenario_blocks_final_variance = seperate_blocks(actual_load_scenarios_variance);
+
+wind_plot = plotting_scenarios(wind_scenario_blocks_final_variance, "Wind Scenario Blocks");
+solar_plot = plotting_scenarios(solar_scenario_blocks_final_variance, "Solar Scenario Blocks");
+load_plot = plotting_scenarios(load_scenario_blocks_final_variance, "Load Scenario Blocks");
+

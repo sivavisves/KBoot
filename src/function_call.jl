@@ -68,3 +68,106 @@ function get_blocks(index_knn, blocks)
     end
     return blocks_knn
 end
+
+function event_quantile_clean(df)
+    new_df = permutedims(df)
+    # Convert the first row to a vector of symbols
+    new_headers = Symbol.(Vector(new_df[1, :]))
+
+    # Rename columns
+    rename!(new_df, new_headers)
+
+    # Delete the first row
+    df = new_df[2:end, :]
+
+    # Convert all columns to Float64
+    for col in names(df)
+        df[!, col] = convert(Vector{Float64}, df[!, col])
+    end
+    return df
+end
+
+function determine_actual_value(marginals::Vector{Float64}, quantile_value::Float64)
+    # If quantile value is at the extremes
+    if quantile_value <= 0.01
+        dif_marginals = marginals[2] - marginals[1]
+        ratio_cal = dif_marginals/0.01
+        return marginals[1] - (0.01 - quantile_value) * ratio_cal
+    elseif quantile_value >= 0.99
+        dif_marginals = marginals[end] - marginals[end-1]
+        ratio_cal = dif_marginals/0.01
+        return marginals[end] + (quantile_value - 0.99) * ratio_cal
+    end
+
+    # If the quantile is within the range
+    for i in 1:(length(marginals)-1)
+        quantile_lower = 0.01 + (i-1)*0.01
+        quantile_upper = 0.01 + i*0.01
+
+        if quantile_lower <= quantile_value <= quantile_upper
+            # Linear interpolation
+            weight = (quantile_value - quantile_lower) / (quantile_upper - quantile_lower)
+            return marginals[i] + weight * (marginals[i+1] - marginals[i])
+        end
+    end
+end
+
+function determine_actual_value(marginals::Vector{Float64}, quantile_value::Float64)
+    # If quantile value is at the extremes
+    if quantile_value <= 0.01
+        dif_marginals = marginals[2] - marginals[1]
+        ratio_cal = dif_marginals/0.01
+        return marginals[1] - (0.01 - quantile_value) * ratio_cal
+    elseif quantile_value >= 0.99
+        dif_marginals = marginals[end] - marginals[end-1]
+        ratio_cal = dif_marginals/0.01
+        return marginals[end] + (quantile_value - 0.99) * ratio_cal
+    end
+
+    # If the quantile is within the range
+    for i in 1:(length(marginals)-1)
+        quantile_lower = 0.01 + (i-1)*0.01
+        quantile_upper = 0.01 + i*0.01
+
+        if quantile_lower <= quantile_value <= quantile_upper
+            # Linear interpolation
+            weight = (quantile_value - quantile_lower) / (quantile_upper - quantile_lower)
+            return marginals[i] + weight * (marginals[i+1] - marginals[i])
+        end
+    end
+end
+
+function get_actual_scenarios(scenarios, event_quantile)
+    actual_scenarios = DataFrame(DateTimeTexas = DateTime[], block = Int64[], BA_total = Float64[])
+    for i in 1:length(scenarios)
+        for j in 1:length(scenarios[i].quantile)
+            push!(actual_scenarios, [scenarios[i].DateTimeTexas[j] i determine_actual_value(event_quantile[!, Symbol("h"*string(j))], scenarios[i].quantile[j])])
+        end
+    end
+    return actual_scenarios
+end
+
+# seperate actual_wind_scenarios into different blocks
+function seperate_blocks(df)
+    blocks = []
+    for i in 1:length(wind_scenario_quantile)
+        push!(blocks, filter(row -> row[:block] == i, df))
+    end
+    return blocks
+end
+
+function plotting_scenarios(scenario_blocks_final, title)
+    x = plot(1:48, scenario_blocks_final[1].BA_total, 
+                color=:black, 
+                alpha=0.5, 
+                linewidth=2, 
+                label="Scenario 1", 
+                title=title, xlabel="Hour", ylabel="Output (MW)", 
+                legend=:outerbottom, legendcolumns=4,
+                xticks=0:4:48)
+
+    for i in 2:length(scenario_blocks_final)
+        plot!(1:48, scenario_blocks_final[i].BA_total, alpha=0.5, linewidth=2, label="Scenario $(i)")
+    end
+    return x
+end
