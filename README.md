@@ -1,3 +1,6 @@
+
+![kboot logo](images/kboot_logo.png)
+
 # KBOOT: KNN-Bootstrapping Method for Scenario Generation
 
 ## Introduction
