@@ -31,4 +31,3 @@ KBOOT, short for KNN-Bootstrapping, is an innovative method developed for scenar
 
 ---
 
-KBOOT represents a significant advancement in scenario generation for stochastic programming, especially in the context of renewable energy integration. Its ability to capture complex temporal patterns and produce diverse, conditional scenarios makes it a powerful tool for energy system analysts and planners.
