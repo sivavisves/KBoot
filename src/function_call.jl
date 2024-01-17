@@ -46,7 +46,7 @@ end
 function hour_disection_quantile(hour, blocks)
     hour_1 = zeros(size(blocks)[1]);
     for i in 1:size(blocks)[1]
-        hour_1[i] = blocks[i][2,:quantile];
+        hour_1[i] = blocks[i][1,:quantile];
     end
     return hour_1
 end
@@ -55,7 +55,7 @@ end
 function hour_disection_variance(hour, blocks)
     hour_1 = zeros(size(blocks)[1]);
     for i in 1:size(blocks)[1]
-        hour_1[i] = blocks[i][2,:variance];
+        hour_1[i] = blocks[i][1,:variance];
     end
     return hour_1
 end
