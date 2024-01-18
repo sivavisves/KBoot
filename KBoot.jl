@@ -36,8 +36,9 @@ function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, so
     df_solar_718 = filter(row -> Dates.month(row[:DateTimeTexas]) == month_of_interest && Dates.day(row[:DateTimeTexas]) == day_of_interest, df_solar);
     df_load_718 = filter(row -> Dates.month(row[:DateTimeTexas]) == month_of_interest && Dates.day(row[:DateTimeTexas]) == day_of_interest, df_load);
 
-    current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k);
-    current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k);
+    current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
+    current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);
+   
 
     #plot nearest neighbors in scatter plot
     wind_knn_quantile = [hour_1_wind_quantile[i] for i in index_quantile];

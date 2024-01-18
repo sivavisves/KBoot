@@ -5,13 +5,23 @@ df_wind = CSV.read("Historical Quantiles/df_wind_2018_historical_quantiles.csv",
 df_solar = CSV.read("Historical Quantiles/df_solar_2018_historical_quantiles.csv", DataFrame);
 df_load = CSV.read("Historical Quantiles/df_load_2018_historical_quantiles.csv", DataFrame);
 
+# correction DateTimeTexas
+df_wind.DateTimeTexas = df_wind.DateTime .- Hour(6);
+df_solar.DateTimeTexas = df_solar.DateTime .- Hour(6);
+df_load.DateTimeTexas = df_load.DateTime .- Hour(6);
+
+# correcting extracted_hour
+df_wind.extracted_hour = hour.(df_wind.DateTimeTexas);
+df_solar.extracted_hour = hour.(df_solar.DateTimeTexas);
+df_load.extracted_hour = hour.(df_load.DateTimeTexas);
+
 # load quantile data
 wind_event_quantile = CSV.read("Quantiles/Wind Quantiles.csv", DataFrame);
 solar_event_quantile = CSV.read("Quantiles/Solar Quantiles.csv", DataFrame);
 load_event_quantile = CSV.read("Quantiles/Load Quantiles.csv", DataFrame);
 
-hour_of_interest = 0;
-horizon = 48;
+hour_of_interest = 23;
+horizon = 25;
 k = 17; # setting the number of nearest neighbors
 month_of_interest = 7;
 day_of_interest = 18;
