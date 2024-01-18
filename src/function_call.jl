@@ -43,7 +43,7 @@ function split_train_test(blocks)
 end
 
 # disecting hours based on the hour of the day (quantile)
-function hour_disection_quantile(hour, blocks)
+function hour_disection_quantile(blocks)
     hour_1 = zeros(size(blocks)[1]);
     for i in 1:size(blocks)[1]
         hour_1[i] = blocks[i][1,:quantile];
@@ -52,7 +52,7 @@ function hour_disection_quantile(hour, blocks)
 end
 
 # disecting hours based on the hour of the day (variance)
-function hour_disection_variance(hour, blocks)
+function hour_disection_variance(blocks)
     hour_1 = zeros(size(blocks)[1]);
     for i in 1:size(blocks)[1]
         hour_1[i] = blocks[i][1,:variance];
