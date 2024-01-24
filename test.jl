@@ -20,8 +20,8 @@ wind_event_quantile = CSV.read("Quantiles/Wind Quantiles.csv", DataFrame);
 solar_event_quantile = CSV.read("Quantiles/Solar Quantiles.csv", DataFrame);
 load_event_quantile = CSV.read("Quantiles/Load Quantiles.csv", DataFrame);
 
-hour_of_interest = 0;
-horizon = 48;
+hour_of_interest = 1;
+horizon = 47;
 k = 17; # setting the number of nearest neighbors
 month_of_interest = 7;
 day_of_interest = 18;

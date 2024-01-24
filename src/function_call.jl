@@ -137,12 +137,15 @@ function determine_actual_value(marginals::Vector{Float64}, quantile_value::Floa
     end
 end
 
-function get_actual_scenarios(scenarios, event_quantile)
+function get_actual_scenarios(scenarios, event_quantile, current_hour)
     actual_scenarios = DataFrame(DateTimeTexas = DateTime[], block = Int64[], BA_total = Float64[])
+    hour_set = current_hour
     for i in 1:length(scenarios)
         for j in 1:length(scenarios[i].quantile)
-            push!(actual_scenarios, [scenarios[i].DateTimeTexas[j] i determine_actual_value(event_quantile[!, Symbol("h"*string(j))], scenarios[i].quantile[j])])
+            push!(actual_scenarios, [scenarios[i].DateTimeTexas[j] i determine_actual_value(event_quantile[!, Symbol("h"*string(hour_set))], scenarios[i].quantile[j])])
+            hour_set += 1
         end
+        hour_set = current_hour
     end
     return actual_scenarios
 end

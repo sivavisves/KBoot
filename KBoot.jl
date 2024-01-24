@@ -86,9 +86,9 @@ function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, so
     solar_event_quantile_clean = event_quantile_clean(solar_event_quantile);
     load_event_quantile_clean = event_quantile_clean(load_event_quantile);
 
-    actual_wind_scenarios_variance = get_actual_scenarios(wind_scenario_variance, wind_event_quantile_clean);
-    actual_solar_scenarios_variance = get_actual_scenarios(solar_scenario_variance, solar_event_quantile_clean);
-    actual_load_scenarios_variance = get_actual_scenarios(load_scenario_variance, load_event_quantile_clean);
+    actual_wind_scenarios_variance = get_actual_scenarios(wind_scenario_variance, wind_event_quantile_clean, hour_of_interest);
+    actual_solar_scenarios_variance = get_actual_scenarios(solar_scenario_variance, solar_event_quantile_clean, hour_of_interest);
+    actual_load_scenarios_variance = get_actual_scenarios(load_scenario_variance, load_event_quantile_clean, hour_of_interest);
 
     wind_scenario_blocks_final_variance = seperate_blocks(actual_wind_scenarios_variance, k);
     solar_scenario_blocks_final_variance = seperate_blocks(actual_solar_scenarios_variance, k);
