@@ -36,5 +36,21 @@ KBOOT, short for KNN-Bootstrapping, is an innovative method developed for scenar
 - **Conditional Sampling**: KBOOT's KNN component enables scenario generation that is quasi-conditional on recent observations, enhancing relevance to the current state of the system.
 - **Diverse Scenarios**: The bootstrapping process ensures a wide array of scenarios, representing various potential future trajectories based on historical patterns.
 
+## Citation
+```
+@software{KBoot,
+  author       = {Siva Visvesvaran},
+  title        = {{KBoot}: KNN-Bootstrapping Scenario Generator},
+  year         = {2023},
+  publisher    = {Github},
+  version      = {v1},
+  url          = {https://github.com/sivavisves/KBoot/},
+  copyright    = {GPL v3.0}
+}
+```
+
+## License
+&copy Siva Visvesvaran, 2024. Licensed under the General Public License v3.0 (GPLv3).
+
 ---
 
