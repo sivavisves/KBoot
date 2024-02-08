@@ -50,7 +50,7 @@ KBOOT, short for KNN-Bootstrapping, is an innovative method developed for scenar
 ```
 
 ## License
-&copy Siva Visvesvaran, 2024. Licensed under the General Public License v3.0 (GPLv3).
+&copy; Siva Visvesvaran, 2024. Licensed under the General Public License v3.0 (GPLv3).
 
 ---
 
