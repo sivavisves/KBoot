@@ -104,7 +104,4 @@ module KBoot
 
         return wind_plot, solar_plot, load_plot, q_knn, v_knn, wind_scenario_blocks_final_variance, solar_scenario_blocks_final_variance, load_scenario_blocks_final_variance
     end
-
-
-
 end
