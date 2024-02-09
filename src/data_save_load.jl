@@ -1,5 +1,7 @@
 using HDF5
 
+export data_to_hdf5, load_scenarios
+
 function data_to_hdf5(name::String, df::Vector{Any})
     filename = name * ".h5"  # Assign the filename with the extension
     h5open(filename, "w") do file
