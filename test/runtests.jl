@@ -3,18 +3,15 @@ using Test
 using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, Dates, NearestNeighbors, Statistics, TimeZones
 
 
-file_wind = "wind_scenario_blocks_hour_0.h5"
-file_solar = "solar_scenario_blocks_hour_0.h5"
-file_load = "load_scenario_blocks_hour_0.h5"
-
-
-wind_scenario_test = load_scenarios(file_wind, "DateTimeTexas")
-solar_scenario_test = load_scenarios(file_solar, "DateTimeTexas")
-load_scenario_test = load_scenarios(file_load, "DateTimeTexas")
-
-
-
 @testset "KBoot.jl" begin
+
+    file_wind = "wind_scenario_blocks_hour_0_test.h5"
+    file_solar = "solar_scenario_blocks_hour_0_test.h5"
+    file_load = "load_scenario_blocks_hour_0_test.h5"
+
+    wind_scenario_test = load_scenarios(file_wind, "DateTimeTexas")
+    solar_scenario_test = load_scenarios(file_solar, "DateTimeTexas")
+    load_scenario_test = load_scenarios(file_load, "DateTimeTexas")
 
     # load historical quantiles
     df_wind = CSV.read("Historical Quantiles/df_wind_2018_historical_quantiles.csv", DataFrame);
