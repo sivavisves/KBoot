@@ -112,30 +112,6 @@ function determine_actual_value(marginals::Vector{Float64}, quantile_value::Floa
     end
 end
 
-function determine_actual_value(marginals::Vector{Float64}, quantile_value::Float64)
-    # If quantile value is at the extremes
-    if quantile_value <= 0.01
-        dif_marginals = marginals[2] - marginals[1]
-        ratio_cal = dif_marginals/0.01
-        return marginals[1] - (0.01 - quantile_value) * ratio_cal
-    elseif quantile_value >= 0.99
-        dif_marginals = marginals[end] - marginals[end-1]
-        ratio_cal = dif_marginals/0.01
-        return marginals[end] + (quantile_value - 0.99) * ratio_cal
-    end
-
-    # If the quantile is within the range
-    for i in 1:(length(marginals)-1)
-        quantile_lower = 0.01 + (i-1)*0.01
-        quantile_upper = 0.01 + i*0.01
-
-        if quantile_lower <= quantile_value <= quantile_upper
-            # Linear interpolation
-            weight = (quantile_value - quantile_lower) / (quantile_upper - quantile_lower)
-            return marginals[i] + weight * (marginals[i+1] - marginals[i])
-        end
-    end
-end
 
 function get_actual_scenarios(scenarios, event_quantile, current_hour)
     actual_scenarios = DataFrame(DateTimeTexas = DateTime[], block = Int64[], BA_total = Float64[])
