@@ -41,3 +41,19 @@ function load_scenarios(file_path, DateTimeColumn)
     end
     return scenarios
 end
+
+function load_price_scenarios(file_path)
+    scenarios = []
+    h5open(file_path, "r") do file
+        for scenario_name in keys(file)
+            scenario_group = file[scenario_name]
+            df = DataFrame()
+            for dataset_name in keys(scenario_group)
+                dataset = read(scenario_group[dataset_name])
+                df[!, dataset_name] = dataset
+            end
+            push!(scenarios, df)
+        end
+    end
+    return scenarios
+end
