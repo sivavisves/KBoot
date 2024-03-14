@@ -14,6 +14,5 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
       - uses: julia-actions/julia-buildpkg@latest
-        working-directory: ./test
       - uses: julia-actions/julia-runtest@latest
         working-directory: ./test
