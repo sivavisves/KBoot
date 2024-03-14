@@ -44,13 +44,13 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
     t = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, month_of_interest, day_of_interest, horizon, hour_of_interest, k)
 
 
-    data_to_hdf5("wind_scenario_blocks_hour_$hour_of_interest", wind_scenario_blocks_final_variance1)
-    data_to_hdf5("solar_scenario_blocks_hour_$hour_of_interest", solar_scenario_blocks_final_variance1)
-    data_to_hdf5("load_scenario_blocks_hour_$hour_of_interest", load_scenario_blocks_final_variance1)
+    data_to_hdf5("test/wind_scenario_blocks_hour_$hour_of_interest", wind_scenario_blocks_final_variance1)
+    data_to_hdf5("test/solar_scenario_blocks_hour_$hour_of_interest", solar_scenario_blocks_final_variance1)
+    data_to_hdf5("test/load_scenario_blocks_hour_$hour_of_interest", load_scenario_blocks_final_variance1)
 
-    file_wind = "wind_scenario_blocks_hour_0.h5"
-    file_solar = "solar_scenario_blocks_hour_0.h5"
-    file_load = "load_scenario_blocks_hour_0.h5"
+    file_wind = "test/wind_scenario_blocks_hour_0.h5"
+    file_solar = "test/solar_scenario_blocks_hour_0.h5"
+    file_load = "test/load_scenario_blocks_hour_0.h5"
 
     @test wind_scenario = load_scenarios(file_wind, "DateTimeTexas") == wind_scenario_test
     @test solar_scenario = load_scenarios(file_solar, "DateTimeTexas") == solar_scenario_test
