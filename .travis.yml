@@ -18,6 +18,7 @@ jobs:
   allow_failures:
     - julia: nightly
 before_script:
+  - pwd
   - ls -alh test/
   - if [ ! -f test/wind_scenario_blocks_hour_0_test.h5 ]; then echo "HDF5 file not found"; exit 1; fi
 after_success:
