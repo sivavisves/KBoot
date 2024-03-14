@@ -5,9 +5,9 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
 
 @testset "KBoot.jl" begin
 
-    file_wind = "test/wind_scenario_blocks_hour_0_test.h5"
-    file_solar = "test/solar_scenario_blocks_hour_0_test.h5"
-    file_load = "test/load_scenario_blocks_hour_0_test.h5"
+    file_wind = "./test/wind_scenario_blocks_hour_0_test.h5"
+    file_solar = "./test/solar_scenario_blocks_hour_0_test.h5"
+    file_load = "./test/load_scenario_blocks_hour_0_test.h5"
 
     wind_scenario_test = load_scenarios(file_wind, "DateTimeTexas")
     solar_scenario_test = load_scenarios(file_solar, "DateTimeTexas")
