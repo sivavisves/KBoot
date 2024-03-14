@@ -1,5 +1,5 @@
 module KBoot
-    using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, Dates, NearestNeighbors, Statistics, TimeZones
+    using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, Dates, NearestNeighbors, Statistics, TimeZones, StatsBase
     include("KBoot_summary_call.jl")
 
     export scenario_generation
