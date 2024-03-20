@@ -27,7 +27,7 @@ KBOOT, short for KNN-Bootstrapping, is an innovative method developed for scenar
 - **Creating Blocks**: Segment the historical quantile data into overlapping blocks (e.g., 48 hours each), sliding by a predetermined step size (e.g., 12 hours). This approach captures distinct historical patterns in each block.
 
 ### KNN Sampling
-- **Reference Point**: Choose a reference point (like the first hour) for the day of interest and identify its quantile value as the "current point."
+- **Reference Point**: Choose a reference point (like the first hour) for the day of interest and identify its quantile value and variance (as a measure of uncertainty) as the "current point."
 - **KNN Application**: Use KNN to locate the k historical blocks whose start aligns closely with the "current point." This ensures that the generated scenarios are quasi-conditional based on the current system state.
 
 ### Block Bootstrapping

@@ -34,6 +34,8 @@ module KBoot
 
         kd_tree_variance = data_prep_knn_variance(hour_1_load_variance, hour_1_wind_variance, hour_1_solar_variance);
 
+        kd_tree_combined = data_prep_knn_combined([hour_1_load_quantile hour_1_wind_quantile hour_1_solar_quantile], [hour_1_load_variance hour_1_wind_variance hour_1_solar_variance]);
+
         #filtering the data for a specific date.
         # filter 7/18 date from df_wind
         df_wind_718 = filter(row -> Dates.month(row[:DateTimeTexas]) == month_of_interest && Dates.day(row[:DateTimeTexas]) == day_of_interest, df_wind);
@@ -42,6 +44,7 @@ module KBoot
 
         current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
         current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);
+        current_point_combined, index_combined, distance_combined = knn_combined(df_load_718, df_wind_718, df_solar_718, kd_tree_combined, k, hour_of_interest);
     
 
         #plot nearest neighbors in scatter plot
@@ -84,6 +87,10 @@ module KBoot
         solar_scenario_variance = get_blocks(index_variance, blocks_solar_train);
         load_scenario_variance = get_blocks(index_variance, blocks_load_train);
 
+        wind_scenario_combined = get_blocks(index_combined, blocks_wind_train);
+        solar_scenario_combined = get_blocks(index_combined, blocks_solar_train);
+        load_scenario_combined = get_blocks(index_combined, blocks_load_train);
+
         #---------------------------------Quantile data---------------------------------#
 
         wind_event_quantile_clean = event_quantile_clean(wind_event_quantile);
@@ -94,14 +101,22 @@ module KBoot
         actual_solar_scenarios_variance = get_actual_scenarios(solar_scenario_variance, solar_event_quantile_clean, hour_of_interest);
         actual_load_scenarios_variance = get_actual_scenarios(load_scenario_variance, load_event_quantile_clean, hour_of_interest);
 
+        actual_wind_scenarios_combined = get_actual_scenarios(wind_scenario_combined, wind_event_quantile_clean, hour_of_interest);
+        actual_solar_scenarios_combined = get_actual_scenarios(solar_scenario_combined, solar_event_quantile_clean, hour_of_interest);
+        actual_load_scenarios_combined = get_actual_scenarios(load_scenario_combined, load_event_quantile_clean, hour_of_interest);
+
+        wind_scenario_blocks_final_combined = seperate_blocks(actual_wind_scenarios_combined, k);
+        solar_scenario_blocks_final_combined = seperate_blocks(actual_solar_scenarios_combined, k);
+        load_scenario_blocks_final_combined = seperate_blocks(actual_load_scenarios_combined, k);
+
         wind_scenario_blocks_final_variance = seperate_blocks(actual_wind_scenarios_variance, k);
         solar_scenario_blocks_final_variance = seperate_blocks(actual_solar_scenarios_variance, k);
         load_scenario_blocks_final_variance = seperate_blocks(actual_load_scenarios_variance, k);
 
-        wind_plot = plotting_scenarios(wind_scenario_blocks_final_variance, "Wind Scenario Blocks", horizon);
-        solar_plot = plotting_scenarios(solar_scenario_blocks_final_variance, "Solar Scenario Blocks", horizon);
-        load_plot = plotting_scenarios(load_scenario_blocks_final_variance, "Load Scenario Blocks", horizon);
+        wind_plot = plotting_scenarios(wind_scenario_blocks_final_combined, "Wind Scenario Blocks", horizon);
+        solar_plot = plotting_scenarios(solar_scenario_blocks_final_combined, "Solar Scenario Blocks", horizon);
+        load_plot = plotting_scenarios(load_scenario_blocks_final_combined, "Load Scenario Blocks", horizon);
 
-        return wind_plot, solar_plot, load_plot, q_knn, v_knn, wind_scenario_blocks_final_variance, solar_scenario_blocks_final_variance, load_scenario_blocks_final_variance
+        return wind_plot, solar_plot, load_plot, q_knn, v_knn, wind_scenario_blocks_final_combined, solar_scenario_blocks_final_combined, load_scenario_blocks_final_combined
     end
 end

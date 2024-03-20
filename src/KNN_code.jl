@@ -12,6 +12,12 @@ function data_prep_knn_variance(hour_load_variance, hour_wind_variance, hour_sol
     return kd_tree_variance
 end
 
+function data_prep_knn_combined(combined_set_quantile, combined_set_variance)
+    combined_set = hcat(combined_set_quantile, combined_set_variance)
+    kd_tree_combined = KDTree(permutedims(combined_set))
+    return kd_tree_combined
+end
+
 # extract hour 1
 filter_hour_df(df, hour) = filter(row -> Dates.hour(row[:DateTimeTexas]) == hour, df);
 
@@ -25,5 +31,11 @@ function knn_variance(df_load_date, df_wind_date, df_solar_date, kd_tree_varianc
     current_point_variance = [filter_hour_df(df_load_date, current_hour).variance[1], filter_hour_df(df_wind_date, current_hour).variance[1], filter_hour_df(df_solar_date, current_hour).variance[1]] # load, wind, solar
     index_knn_variance, distance_variance = knn(kd_tree_variance, current_point_variance, k, true);
     return current_point_variance, index_knn_variance, distance_variance
+end
+
+function knn_combined(df_load_date, df_wind_date, df_solar_date, kd_tree_combined, k, current_hour)
+    current_point_combined = [filter_hour_df(df_load_date, current_hour).quantile[1], filter_hour_df(df_wind_date, current_hour).quantile[1], filter_hour_df(df_solar_date, current_hour).quantile[1], filter_hour_df(df_load_date, current_hour).variance[1], filter_hour_df(df_wind_date, current_hour).variance[1], filter_hour_df(df_solar_date, current_hour).variance[1]] # load, wind, solar
+    index_knn_combined, distance_combined = knn(kd_tree_combined, current_point_combined, k, true);
+    return current_point_combined, index_knn_combined, distance_combined
 end
 
