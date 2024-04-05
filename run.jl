@@ -10,10 +10,6 @@ function covert2array(vec_df::Vector{Any})::Array{Float64, 2}
     return array
 end
 
-# # load historical quantiles
-# df_wind = CSV.read("Historical Quantiles/df_wind_2018_historical_quantiles.csv", DataFrame);
-# df_solar = CSV.read("Historical Quantiles/df_solar_2018_historical_quantiles.csv", DataFrame);
-# df_load = CSV.read("Historical Quantiles/df_load_2018_historical_quantiles.csv", DataFrame);
 
 function  read_event_quantiles(filename::AbstractString; isload = false)::DataFrame
     forecast = h5open(filename, "r") do file
@@ -35,6 +31,7 @@ function  read_event_quantiles(filename::AbstractString; isload = false)::DataFr
     return df
 end
 
+include("data_process.jl")
 df_wind, df_solar, df_load = process_forecast_quantiles(df_wind, df_solar, df_load, df_wind_forecast_quantiles, df_solar_forecast_quantiles, df_load_forecast_quantiles, df_wind_forecast, df_solar_forecast, df_load_forecast)
 # correction DateTimeNY
 df_wind.DateTimeNY = df_wind.DateTime .- Hour(4);

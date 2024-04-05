@@ -68,13 +68,8 @@ function  read_forecast_8760(filename::AbstractString; isload = false)::DataFram
     return df
 end
 
-
-
-
+#---------------------------File Location---------------------------#
 data_dir = "/Users/hanshu/Desktop/Price_formation/Data/ARPAE_NYISO"
-output_dir = "/Users/hanshu/Desktop/Price_formation/Data/generate_fr_KBoot/idx_hour/"
-
-#---------------------------Data Loading---------------------------#
 solar_fcst_file = joinpath(data_dir, "BA_solar_1day-ahead_fcst_2019.h5")
 wind_fcst_file = joinpath(data_dir, "BA_wind_1day-ahead_fcst_2019.h5")
 load_fcst_file = joinpath(data_dir, "BA_load_1day-ahead_fcst_2019.h5")
@@ -82,6 +77,7 @@ solar_actual_file = joinpath(data_dir, "BA_solar_actuals_2019.h5")
 wind_actual_file = joinpath(data_dir, "BA_wind_actuals_2019.h5")
 load_actual_file = joinpath(data_dir, "BA_load_actuals_2019.h5")
 
+#---------------------------Data Loading---------------------------#
 df_wind = read_actuals(wind_actual_file)
 df_solar = read_actuals(solar_actual_file)
 df_load = read_actuals(load_actual_file; isload = true)
@@ -89,7 +85,6 @@ df_load = read_actuals(load_actual_file; isload = true)
 df_wind_forecast_quantiles = read_forecast_quantiles(wind_fcst_file)
 df_solar_forecast_quantiles = read_forecast_quantiles(solar_fcst_file)
 df_load_forecast_quantiles = read_forecast_quantiles(load_fcst_file; isload = true)
-
 
 #---------------------------Preprocessing---------------------------#
 x = df_wind_forecast_quantiles.datetime .- Hour(6);
@@ -101,16 +96,11 @@ df_wind = insertcols!(df_wind, 1, :DateTimeTexas => x);
 df_solar = insertcols!(df_solar, 1, :DateTimeTexas => x);
 df_load = insertcols!(df_load, 1, :DateTimeTexas => x);
 
-# only take DateTime at year 2017-12-31
 df_wind = df_wind[df_wind.DateTime .>= DateTime(2019, 01, 01, 0, 0, 0), :];
 df_solar = df_solar[df_solar.DateTime .>= DateTime(2019, 01, 01, 0, 0, 0), :];
 df_load = df_load[df_load.DateTime .>= DateTime(2019, 01, 01, 0, 0, 0), :];
 
-#---------------------------Function---------------------------#
-# Load quantiles for conversion
 df_wind_forecast = read_forecast_8760(wind_fcst_file)
 df_solar_forecast = read_forecast_8760(solar_fcst_file)
 df_load_forecast = read_forecast_8760(load_fcst_file; isload = true)
-
-# x = process_forecast_quantiles(df_wind, df_solar, df_load, df_wind_forecast_quantiles, df_solar_forecast_quantiles, df_load_forecast_quantiles, df_wind_forecast, df_solar_forecast, df_load_forecast);
 
