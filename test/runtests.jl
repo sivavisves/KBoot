@@ -5,18 +5,18 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
 
 @testset "KBoot.jl" begin
 
-    file_wind = "../test/wind_scenario_blocks_hour_0_test.h5"
-    file_solar = "../test/solar_scenario_blocks_hour_0_test.h5"
-    file_load = "../test/load_scenario_blocks_hour_0_test.h5"
+    file_wind = "./test/wind_scenario_blocks_hour_0_test.h5"
+    file_solar = "./test/solar_scenario_blocks_hour_0_test.h5"
+    file_load = "./test/load_scenario_blocks_hour_0_test.h5"
 
     wind_scenario_test = load_scenarios(file_wind, "DateTimeTexas")
     solar_scenario_test = load_scenarios(file_solar, "DateTimeTexas")
     load_scenario_test = load_scenarios(file_load, "DateTimeTexas")
 
     # load historical quantiles
-    df_wind = CSV.read("../Historical Quantiles/df_wind_2018_historical_quantiles.csv", DataFrame);
-    df_solar = CSV.read("../Historical Quantiles/df_solar_2018_historical_quantiles.csv", DataFrame);
-    df_load = CSV.read("../Historical Quantiles/df_load_2018_historical_quantiles.csv", DataFrame);
+    df_wind = CSV.read("./Historical Quantiles/df_wind_2018_historical_quantiles.csv", DataFrame);
+    df_solar = CSV.read("./Historical Quantiles/df_solar_2018_historical_quantiles.csv", DataFrame);
+    df_load = CSV.read("./Historical Quantiles/df_load_2018_historical_quantiles.csv", DataFrame);
     
     # correction DateTimeTexas
     df_wind.DateTimeTexas = df_wind.DateTime .- Hour(6);
@@ -29,9 +29,9 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
     df_load.extracted_hour = hour.(df_load.DateTimeTexas);
 
     # load quantile data
-    wind_event_quantile = CSV.read("../Quantiles/Wind Quantiles.csv", DataFrame);
-    solar_event_quantile = CSV.read("../Quantiles/Solar Quantiles.csv", DataFrame);
-    load_event_quantile = CSV.read("../Quantiles/Load Quantiles.csv", DataFrame);
+    wind_event_quantile = CSV.read("./Quantiles/Wind Quantiles.csv", DataFrame);
+    solar_event_quantile = CSV.read("./Quantiles/Solar Quantiles.csv", DataFrame);
+    load_event_quantile = CSV.read("./Quantiles/Load Quantiles.csv", DataFrame);
 
     hour_of_interest = 0;
     horizon = 47;
