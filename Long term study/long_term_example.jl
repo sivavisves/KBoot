@@ -58,7 +58,8 @@ output_dir = "./Long term study/Scenario Data/"
     month_of_interest = Dates.month(run_time)
     day_of_interest = Dates.day(run_time)
     hour_of_interest = Dates.hour(run_time)
-    wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_quantile, solar_quantile, load_quantile, month_of_interest, day_of_interest, horizon, hour_of_interest, k);
+    year_of_interest = Dates.year(run_time)
+    wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_quantile, solar_quantile, load_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     h5open(output_dir*"load_scenarios.h5", "cw") do file
         write(file, string(run_time), load_scenarios_array)
