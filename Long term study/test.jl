@@ -38,9 +38,9 @@ df_solar.extracted_hour = hour.(df_solar.DateTimeTexas);
 df_load.extracted_hour = hour.(df_load.DateTimeTexas);
 
 # load quantile data
-wind_event_quantile = CSV.read("./Data Preparation/Sample Data/Quantiles/Forecasts/wind_forecast_conversion.csv", DataFrame);
-solar_event_quantile = CSV.read("./Data Preparation/Sample Data/Quantiles/Forecasts/solar_forecast_conversion.csv", DataFrame);
-load_event_quantile = CSV.read("./Data Preparation/Sample Data/Quantiles/Forecasts/load_forecast_conversion.csv", DataFrame);
+wind_event_quantile = CSV.read("./Long term study/Data File/wind_forecast_conversion.csv", DataFrame);
+solar_event_quantile = CSV.read("./Long term study/Data File/solar_forecast_conversion.csv", DataFrame);
+load_event_quantile = CSV.read("./Long term study/Data File/load_forecast_conversion.csv", DataFrame);
 
 wind_quantile = quantile_data_prep(wind_event_quantile)
 solar_quantile = quantile_data_prep(solar_event_quantile)
@@ -101,3 +101,11 @@ function extract_first_point(df)
     return [df.BA_total[1]]
 end
 current_point = [extract_first_point(df_load_718), extract_first_point(df_wind_718), extract_first_point(df_solar_718)]
+
+new_df = permutedims(wind_event_quantile);
+
+new_headers = Symbol.(Vector(new_df[1, :]))
+
+wind_event_quantile_clean = event_quantile_clean(wind_event_quantile);
+solar_event_quantile_clean = event_quantile_clean(solar_event_quantile);
+load_event_quantile_clean = event_quantile_clean(load_event_quantile);

@@ -38,9 +38,9 @@ df_solar.extracted_hour = hour.(df_solar.DateTimeTexas);
 df_load.extracted_hour = hour.(df_load.DateTimeTexas);
 
 # load quantile data
-wind_event_quantile = CSV.read("./Data Preparation/Sample Data/Quantiles/Forecasts/wind_forecast_conversion.csv", DataFrame);
-solar_event_quantile = CSV.read("./Data Preparation/Sample Data/Quantiles/Forecasts/solar_forecast_conversion.csv", DataFrame);
-load_event_quantile = CSV.read("./Data Preparation/Sample Data/Quantiles/Forecasts/load_forecast_conversion.csv", DataFrame);
+wind_event_quantile = CSV.read("./Long term study/Data File/wind_forecast_conversion.csv", DataFrame);
+solar_event_quantile = CSV.read("./Long term study/Data File/solar_forecast_conversion.csv", DataFrame);
+load_event_quantile = CSV.read("./Long term study/Data File/load_forecast_conversion.csv", DataFrame);
 
 wind_quantile = quantile_data_prep(wind_event_quantile)
 solar_quantile = quantile_data_prep(solar_event_quantile)
@@ -59,7 +59,7 @@ output_dir = "./Long term study/Scenario Data/"
     day_of_interest = Dates.day(run_time)
     hour_of_interest = Dates.hour(run_time)
     year_of_interest = Dates.year(run_time)
-    wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_quantile, solar_quantile, load_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k);
+    wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_quantile, solar_quantile, load_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, i-1);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     h5open(output_dir*"load_scenarios.h5", "cw") do file
         write(file, string(run_time), load_scenarios_array)
