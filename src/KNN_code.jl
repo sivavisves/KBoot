@@ -39,3 +39,7 @@ function knn_combined(df_load_date, df_wind_date, df_solar_date, kd_tree_combine
     return current_point_combined, index_knn_combined, distance_combined
 end
 
+function extract_first_point(df)
+    return [df.BA_total[1]]
+end
+

@@ -45,6 +45,7 @@ module KBoot
         current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
         current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);
         current_point_combined, index_combined, distance_combined = knn_combined(df_load_718, df_wind_718, df_solar_718, kd_tree_combined, k, hour_of_interest);
+        current_point = [extract_first_point(df_load_718), extract_first_point(df_wind_718), extract_first_point(df_solar_718)]; # load, wind, solar
     
 
         #plot nearest neighbors in scatter plot
@@ -112,6 +113,12 @@ module KBoot
         wind_scenario_blocks_final_variance = seperate_blocks(actual_wind_scenarios_variance, k);
         solar_scenario_blocks_final_variance = seperate_blocks(actual_solar_scenarios_variance, k);
         load_scenario_blocks_final_variance = seperate_blocks(actual_load_scenarios_variance, k);
+
+        for i in 1:k
+            load_scenario_blocks_final_combined[i][1,:].BA_total = current_point[1][1];
+            wind_scenario_blocks_final_combined[i][1,:].BA_total = current_point[2][1];
+            solar_scenario_blocks_final_combined[i][1,:].BA_total = current_point[3][1];
+        end
 
         wind_plot = plotting_scenarios(wind_scenario_blocks_final_combined, "Wind Scenario Blocks", horizon);
         solar_plot = plotting_scenarios(solar_scenario_blocks_final_combined, "Solar Scenario Blocks", horizon);
