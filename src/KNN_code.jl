@@ -43,3 +43,17 @@ function extract_first_point(df)
     return [df.BA_total[1]]
 end
 
+function filter_by_datetime_range(df::DataFrame, datetime_col::Symbol, year_of_interest::Int, month_of_interest::Int, day_of_interest::Int, hour_of_interest::Int, horizon_hours::Int)
+    # Calculate the start and end datetime of interest
+    start_datetime = DateTime(year_of_interest, month_of_interest, day_of_interest, hour_of_interest)
+    end_datetime = start_datetime + Hour(horizon_hours)
+    
+    # Filter the DataFrame based on the datetime range
+    filtered_df = filter(row -> begin
+        datetime_val = row[datetime_col]
+        datetime_val >= start_datetime && datetime_val < end_datetime
+    end, df)
+    
+    return filtered_df
+end
+

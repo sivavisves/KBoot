@@ -4,7 +4,7 @@ module KBoot
 
     export scenario_generation
 
-    function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, month_of_interest, day_of_interest, horizon, hour_of_interest, k)
+    function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k)
             # Data cleaning and processing phase
         hour_1_wind_variance, blocks_wind_train, blocks_wind_test= process_energy_data_variance(df_wind, hour_of_interest, horizon);
         hour_1_solar_variance, blocks_solar_train, blocks_solar_test = process_energy_data_variance(df_solar, hour_of_interest, horizon);
@@ -38,10 +38,10 @@ module KBoot
 
         #filtering the data for a specific date.
         # filter 7/18 date from df_wind
-        df_wind_718 = filter(row -> Dates.month(row[:DateTimeTexas]) == month_of_interest && Dates.day(row[:DateTimeTexas]) == day_of_interest, df_wind);
-        df_solar_718 = filter(row -> Dates.month(row[:DateTimeTexas]) == month_of_interest && Dates.day(row[:DateTimeTexas]) == day_of_interest, df_solar);
-        df_load_718 = filter(row -> Dates.month(row[:DateTimeTexas]) == month_of_interest && Dates.day(row[:DateTimeTexas]) == day_of_interest, df_load);
-
+        df_wind_718 = filter_by_datetime_range(df_wind, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_solar_718 = filter_by_datetime_range(df_solar, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_load_718 = filter_by_datetime_range(df_load, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        
         current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
         current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);
         current_point_combined, index_combined, distance_combined = knn_combined(df_load_718, df_wind_718, df_solar_718, kd_tree_combined, k, hour_of_interest);
