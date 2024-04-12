@@ -87,12 +87,16 @@ function event_quantile_clean(df)
     return df
 end
 
-function determine_actual_value(marginals::Vector{Float64}, quantile_value::Float64)
+function determine_actual_value(marginals::Vector{Float64}, quantile_value::Float64; floor_value::Bool=true)
     # If quantile value is at the extremes
     if quantile_value <= 0.01
         dif_marginals = marginals[2] - marginals[1]
         ratio_cal = dif_marginals/0.01
-        return marginals[1] - (0.01 - quantile_value) * ratio_cal
+        if floor_value
+            return max(marginals[1] - (0.01 - quantile_value) * ratio_cal, 0)
+        else
+            return marginals[1] - (0.01 - quantile_value) * ratio_cal
+        end
     elseif quantile_value >= 0.99
         dif_marginals = marginals[end] - marginals[end-1]
         ratio_cal = dif_marginals/0.01
