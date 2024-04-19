@@ -10,28 +10,25 @@ function covert2array(vec_df::Vector{Any})::Array{Float64, 2}
     return array
 end
 
-
-function  read_event_quantiles(filename::AbstractString; isload = false)::DataFrame
+function  read_event_quantiles_min(filename::AbstractString; issolar::Bool=false)::DataFrame
     forecast = h5open(filename, "r") do file
         return read(file)
     end
     header = ["p_$i" for i in 1:99]
-    if isload
-        ncols = size(forecast["forecasts"], 2)
-        new_matrix = zeros(Float32, size(forecast["forecasts"], 1), Int(ncols/2))
-        for col in 1:2:ncols
-            new_matrix[:, cld(col, 2)] = mean(forecast["forecasts"][:, col:col+1], dims=2)
-        end
-        df = DataFrame(transpose(new_matrix), header)
-    else
-        qunatile_matrix = [parse(Float32, element) for element in forecast["forecasts"]]
-        df = DataFrame(transpose(qunatile_matrix), header)
+    if issolar
+        forecast["forecasts"] = hcat(forecast["forecasts"][:, 1:40], forecast["forecasts"][:, 81:end])
     end
-    insertcols!(df, 1, :forecast_time => ["h$i" for i in 0:8759]);
+    matrix = forecast["forecasts"][:, 2:2:end]
+    matrix = repeat(matrix, inner=(1,3))
+    df = DataFrame(transpose(matrix), header)
+    fcst_time = range(DateTime(2019, 1, 1, 0, 0, 0), stop = DateTime(2019, 12, 31, 23, 55, 0), step = Minute(5))
+    insertcols!(df, 1, :forecast_time => fcst_time)
     return df
 end
 
-include("data_process.jl")
+
+
+include("data_process_min5.jl")
 df_wind, df_solar, df_load = process_forecast_quantiles(df_wind, df_solar, df_load, df_wind_forecast_quantiles, df_solar_forecast_quantiles, df_load_forecast_quantiles, df_wind_forecast, df_solar_forecast, df_load_forecast)
 # correction LocalDateTime
 df_wind.LocalDateTime = df_wind.DateTime .- Hour(4);
@@ -42,19 +39,21 @@ df_wind.extracted_hour = hour.(df_wind.LocalDateTime);
 df_solar.extracted_hour = hour.(df_solar.LocalDateTime);
 df_load.extracted_hour = hour.(df_load.LocalDateTime);
 
-wind_event_quantile = read_event_quantiles(wind_fcst_file)
-solar_event_quantile = read_event_quantiles(solar_fcst_file)
-load_event_quantile = read_event_quantiles(load_fcst_file; isload = true)
+wind_event_quantile = read_event_quantiles_min(wind_fcst_file)
+solar_event_quantile = read_event_quantiles_min(solar_fcst_file; issolar = true)
+load_event_quantile = read_event_quantiles_min(load_fcst_file)
 
 
 horizon = 48;
 k = 10; # setting the number of nearest neighbors
 initial_time = Dates.DateTime(2019, 1, 1)
-output_dir = "/Users/hanshu/Desktop/Price_formation/Data/generate_fr_KBoot/NYISO/"
+output_dir = "/Users/hanshu/Desktop/Price_formation/Data/generate_fr_KBoot/NYISO/Min5/"
 
-for i in 1:(8760-horizon+1)
-    run_time = initial_time + Hour(i - 1)
-    
+for i in 1:(8760*12-horizon+1)
+    run_time = initial_time + (i-1)*Minute(5)
+    if i%100 == 0
+        @info "generate $run_time"
+    end
     wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     h5open(output_dir*"load_scenarios.h5", "cw") do file

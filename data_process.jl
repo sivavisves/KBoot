@@ -89,12 +89,12 @@ df_load_forecast_quantiles = read_forecast_quantiles(load_fcst_file; isload = tr
 #---------------------------Preprocessing---------------------------#
 x = df_wind_forecast_quantiles.datetime .- Hour(6);
 
-df_wind_forecast_quantiles = insertcols!(df_wind_forecast_quantiles, 1, :DateTimeTexas => x);
-df_solar_forecast_quantiles = insertcols!(df_solar_forecast_quantiles, 1, :DateTimeTexas => x);
-df_load_forecast_quantiles = insertcols!(df_load_forecast_quantiles, 1, :DateTimeTexas => x);
-df_wind = insertcols!(df_wind, 1, :DateTimeTexas => x);
-df_solar = insertcols!(df_solar, 1, :DateTimeTexas => x);
-df_load = insertcols!(df_load, 1, :DateTimeTexas => x);
+df_wind_forecast_quantiles = insertcols!(df_wind_forecast_quantiles, 1, :LocalDateTime => x);
+df_solar_forecast_quantiles = insertcols!(df_solar_forecast_quantiles, 1, :LocalDateTime => x);
+df_load_forecast_quantiles = insertcols!(df_load_forecast_quantiles, 1, :LocalDateTime => x);
+df_wind = insertcols!(df_wind, 1, :LocalDateTime => x);
+df_solar = insertcols!(df_solar, 1, :LocalDateTime => x);
+df_load = insertcols!(df_load, 1, :LocalDateTime => x);
 
 df_wind = df_wind[df_wind.DateTime .>= DateTime(2019, 01, 01, 0, 0, 0), :];
 df_solar = df_solar[df_solar.DateTime .>= DateTime(2019, 01, 01, 0, 0, 0), :];

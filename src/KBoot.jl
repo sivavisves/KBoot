@@ -4,8 +4,13 @@ module KBoot
 
     export scenario_generation
 
-    function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, quantile_hour)
-            # Data cleaning and processing phase
+    function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k)
+        year_of_interest = Dates.year(run_time)
+        month_of_interest = Dates.month(run_time)
+        day_of_interest = Dates.day(run_time)
+        hour_of_interest = Dates.hour(run_time)
+        minute_of_interest = Dates.minute(run_time)
+        # Data cleaning and processing phase
         hour_1_wind_variance, blocks_wind_train, blocks_wind_test= process_energy_data_variance(df_wind, hour_of_interest, horizon);
         hour_1_solar_variance, blocks_solar_train, blocks_solar_test = process_energy_data_variance(df_solar, hour_of_interest, horizon);
         hour_1_load_variance, blocks_load_train, blocks_load_test = process_energy_data_variance(df_load, hour_of_interest, horizon);
@@ -38,9 +43,9 @@ module KBoot
 
         #filtering the data for a specific date.
         # filter 7/18 date from df_wind
-        df_wind_718 = filter_by_datetime_range(df_wind, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
-        df_solar_718 = filter_by_datetime_range(df_solar, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
-        df_load_718 = filter_by_datetime_range(df_load, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_wind_718 = filter_by_datetime_range(df_wind, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_solar_718 = filter_by_datetime_range(df_solar, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_load_718 = filter_by_datetime_range(df_load, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
         
         current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
         current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);
@@ -98,13 +103,13 @@ module KBoot
         solar_event_quantile_clean = event_quantile_clean(solar_event_quantile);
         load_event_quantile_clean = event_quantile_clean(load_event_quantile);
 
-        actual_wind_scenarios_variance = get_actual_scenarios(wind_scenario_variance, wind_event_quantile_clean, quantile_hour);
-        actual_solar_scenarios_variance = get_actual_scenarios(solar_scenario_variance, solar_event_quantile_clean, quantile_hour);
-        actual_load_scenarios_variance = get_actual_scenarios(load_scenario_variance, load_event_quantile_clean, quantile_hour);
+        actual_wind_scenarios_variance = get_actual_scenarios(wind_scenario_variance, wind_event_quantile_clean, run_time);
+        actual_solar_scenarios_variance = get_actual_scenarios(solar_scenario_variance, solar_event_quantile_clean, run_time);
+        actual_load_scenarios_variance = get_actual_scenarios(load_scenario_variance, load_event_quantile_clean, run_time);
 
-        actual_wind_scenarios_combined = get_actual_scenarios(wind_scenario_combined, wind_event_quantile_clean, quantile_hour);
-        actual_solar_scenarios_combined = get_actual_scenarios(solar_scenario_combined, solar_event_quantile_clean, quantile_hour);
-        actual_load_scenarios_combined = get_actual_scenarios(load_scenario_combined, load_event_quantile_clean, quantile_hour);
+        actual_wind_scenarios_combined = get_actual_scenarios(wind_scenario_combined, wind_event_quantile_clean, run_time);
+        actual_solar_scenarios_combined = get_actual_scenarios(solar_scenario_combined, solar_event_quantile_clean, run_time);
+        actual_load_scenarios_combined = get_actual_scenarios(load_scenario_combined, load_event_quantile_clean, run_time);
 
         wind_scenario_blocks_final_combined = seperate_blocks(actual_wind_scenarios_combined, k);
         solar_scenario_blocks_final_combined = seperate_blocks(actual_solar_scenarios_combined, k);

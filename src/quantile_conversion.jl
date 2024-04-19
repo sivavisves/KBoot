@@ -49,9 +49,11 @@ function determine_quantile(marginals::Vector{Float64}, actual_value::Float64)
 end
 
 function quantile_interpolation(df_forecast, actuals)
-    test_x = zeros(8760)
-    for i in 1:8760
-        test_x[i] = determine_quantile(Float64.(df_forecast[!, Symbol("h"*string(i))]), actuals[i, :BA_total])
+    num_row = size(actuals, 1)
+    test_x = zeros(num_row)
+    for i in 1:num_row
+        key = Dates.format(actuals[i, :DateTime], "yyyy-mm-dd HH:MM:SS") 
+        test_x[i] = determine_quantile(Float64.(df_forecast[!, key]), actuals[i, :BA_total])
     end
     return test_x
 end
@@ -104,9 +106,10 @@ end
 function compute_variance(df::DataFrame)
     num_columns = size(df, 2)
     variances = zeros(num_columns)
-
+    datetime = range(DateTime(2019, 1, 1, 0, 0, 0), stop = DateTime(2019, 12, 31, 23, 55, 0), step = Minute(5))
     for i in 1:num_columns
-        kde_fit = kde(df[!, Symbol("h"*string(i))])
+        key = Dates.format(datetime[i], "yyyy-mm-dd HH:MM:SS") 
+        kde_fit = kde(df[!, key])
         E_X = sum(kde_fit.x .* kde_fit.density) * step(kde_fit.x)
         E_X2 = sum(kde_fit.x .^ 2 .* kde_fit.density) * step(kde_fit.x)
         variance = E_X2 - E_X^2
