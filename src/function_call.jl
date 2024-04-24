@@ -1,18 +1,19 @@
 using DataFrames, Dates
 
-function block_disection(df_set::DataFrame, current_hour::Int, block_size::Int)
+function block_disection(df_set::DataFrame, current_hour::Int, current_min::Int, block_size::Int)
     # Convert the LocalDateTime column to a DateTime object
     #df_set[!, :DateTimeObj] = DateTime.(df_set[!, :LocalDateTime], "yyyy-mm-ddTHH:MM:SS.sss")
-    df_set[!, :extracted_hour] = hour.(df_set[!, :LocalDateTime])
+    # df_set[!, :extracted_hour] = hour.(df_set[!, :LocalDateTime])
 
-    # Find the index of the first occurrence of current_hour in the dataset
-    start_index = findfirst(isequal(current_hour), df_set[!, :extracted_hour])
+    # Find the index of the first occurrence of current_hour & current_min in the dataset
+    # start_index = findfirst(isequal(current_hour), df_set[!, :extracted_hour])
+    start_index = findfirst(dt -> (hour(dt) == current_hour && minute(dt) == current_min), df_set[!, :LocalDateTime])
     if isnothing(start_index)  # If the current_hour is not found in the dataset, return an empty array
         return []
     end
 
     # Extract blocks starting from the start_index
-    stride = 24
+    stride = 24*12
     blocks = []
     idx = start_index
 

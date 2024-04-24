@@ -19,22 +19,23 @@ function data_prep_knn_combined(combined_set_quantile, combined_set_variance)
 end
 
 # extract hour 1
-filter_hour_df(df, hour) = filter(row -> Dates.hour(row[:LocalDateTime]) == hour, df);
+filter_time_df(df, run_time) = filter(row -> 
+    Dates.hour(row[:LocalDateTime]) == hour(run_time) && Dates.minute(row[:LocalDateTime]) == minute(run_time), df);
 
-function knn_quantile(df_load_date, df_wind_date, df_solar_date, kd_tree_quantile, k, current_hour)
-    current_point_quantile = [filter_hour_df(df_load_date, current_hour).quantile[1], filter_hour_df(df_wind_date, current_hour).quantile[1], filter_hour_df(df_solar_date, current_hour).quantile[1]] # load, wind, solar
+function knn_quantile(df_load_date, df_wind_date, df_solar_date, kd_tree_quantile, k, current_time)
+    current_point_quantile = [filter_time_df(df_load_date, current_time).quantile[1], filter_time_df(df_wind_date, current_time).quantile[1], filter_time_df(df_solar_date, current_time).quantile[1]] # load, wind, solar
     index_knn_quantile, distance_quantile = knn(kd_tree_quantile, current_point_quantile, k, true);
     return current_point_quantile, index_knn_quantile, distance_quantile
 end
 
-function knn_variance(df_load_date, df_wind_date, df_solar_date, kd_tree_variance, k, current_hour)
-    current_point_variance = [filter_hour_df(df_load_date, current_hour).variance[1], filter_hour_df(df_wind_date, current_hour).variance[1], filter_hour_df(df_solar_date, current_hour).variance[1]] # load, wind, solar
+function knn_variance(df_load_date, df_wind_date, df_solar_date, kd_tree_variance, k, current_time)
+    current_point_variance = [filter_time_df(df_load_date, current_time).variance[1], filter_time_df(df_wind_date, current_time).variance[1], filter_time_df(df_solar_date, current_time).variance[1]] # load, wind, solar
     index_knn_variance, distance_variance = knn(kd_tree_variance, current_point_variance, k, true);
     return current_point_variance, index_knn_variance, distance_variance
 end
 
-function knn_combined(df_load_date, df_wind_date, df_solar_date, kd_tree_combined, k, current_hour)
-    current_point_combined = [filter_hour_df(df_load_date, current_hour).quantile[1], filter_hour_df(df_wind_date, current_hour).quantile[1], filter_hour_df(df_solar_date, current_hour).quantile[1], filter_hour_df(df_load_date, current_hour).variance[1], filter_hour_df(df_wind_date, current_hour).variance[1], filter_hour_df(df_solar_date, current_hour).variance[1]] # load, wind, solar
+function knn_combined(df_load_date, df_wind_date, df_solar_date, kd_tree_combined, k, current_time)
+    current_point_combined = [filter_time_df(df_load_date, current_time).quantile[1], filter_time_df(df_wind_date, current_time).quantile[1], filter_time_df(df_solar_date, current_time).quantile[1], filter_time_df(df_load_date, current_time).variance[1], filter_time_df(df_wind_date, current_time).variance[1], filter_time_df(df_solar_date, current_time).variance[1]] # load, wind, solar
     index_knn_combined, distance_combined = knn(kd_tree_combined, current_point_combined, k, true);
     return current_point_combined, index_knn_combined, distance_combined
 end
@@ -43,10 +44,10 @@ function extract_first_point(df)
     return [df.BA_total[1]]
 end
 
-function filter_by_datetime_range(df::DataFrame, datetime_col::Symbol, year_of_interest::Int, month_of_interest::Int, day_of_interest::Int, hour_of_interest::Int, horizon_hours::Int)
+function filter_by_datetime_range(df::DataFrame, datetime_col::Symbol, start_datetime::DateTime, horizon_length::Int)
     # Calculate the start and end datetime of interest
-    start_datetime = DateTime(year_of_interest, month_of_interest, day_of_interest, hour_of_interest)
-    end_datetime = start_datetime + Hour(horizon_hours)
+    # end_datetime = start_datetime + Hour(horizon_hours)
+    end_datetime = start_datetime + Minute(5*horizon_length)
     
     # Filter the DataFrame based on the datetime range
     filtered_df = filter(row -> begin

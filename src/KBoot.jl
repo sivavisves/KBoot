@@ -11,13 +11,13 @@ module KBoot
         hour_of_interest = Dates.hour(run_time)
         minute_of_interest = Dates.minute(run_time)
         # Data cleaning and processing phase
-        hour_1_wind_variance, blocks_wind_train, blocks_wind_test= process_energy_data_variance(df_wind, hour_of_interest, horizon);
-        hour_1_solar_variance, blocks_solar_train, blocks_solar_test = process_energy_data_variance(df_solar, hour_of_interest, horizon);
-        hour_1_load_variance, blocks_load_train, blocks_load_test = process_energy_data_variance(df_load, hour_of_interest, horizon);
+        hour_1_wind_variance, blocks_wind_train, blocks_wind_test= process_energy_data_variance(df_wind, hour_of_interest, minute_of_interest, horizon);
+        hour_1_solar_variance, blocks_solar_train, blocks_solar_test = process_energy_data_variance(df_solar, hour_of_interest, minute_of_interest, horizon);
+        hour_1_load_variance, blocks_load_train, blocks_load_test = process_energy_data_variance(df_load, hour_of_interest, minute_of_interest, horizon);
 
-        hour_1_wind_quantile = process_energy_data_quantile(df_wind, hour_of_interest, horizon);
-        hour_1_solar_quantile = process_energy_data_quantile(df_solar, hour_of_interest, horizon);
-        hour_1_load_quantile = process_energy_data_quantile(df_load, hour_of_interest, horizon);
+        hour_1_wind_quantile = process_energy_data_quantile(df_wind, hour_of_interest, minute_of_interest, horizon);
+        hour_1_solar_quantile = process_energy_data_quantile(df_solar, hour_of_interest, minute_of_interest, horizon);
+        hour_1_load_quantile = process_energy_data_quantile(df_load, hour_of_interest, minute_of_interest, horizon);
 
         p_knn = scatter(hour_1_load_quantile, hour_1_wind_quantile, hour_1_solar_quantile, 
                         xlabel="Load", 
@@ -43,13 +43,13 @@ module KBoot
 
         #filtering the data for a specific date.
         # filter 7/18 date from df_wind
-        df_wind_718 = filter_by_datetime_range(df_wind, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
-        df_solar_718 = filter_by_datetime_range(df_solar, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
-        df_load_718 = filter_by_datetime_range(df_load, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_wind_718 = filter_by_datetime_range(df_wind, :LocalDateTime, run_time, horizon);
+        df_solar_718 = filter_by_datetime_range(df_solar, :LocalDateTime, run_time, horizon);
+        df_load_718 = filter_by_datetime_range(df_load, :LocalDateTime, run_time, horizon);
         
-        current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
-        current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);
-        current_point_combined, index_combined, distance_combined = knn_combined(df_load_718, df_wind_718, df_solar_718, kd_tree_combined, k, hour_of_interest);
+        current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, run_time);
+        current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, run_time);
+        current_point_combined, index_combined, distance_combined = knn_combined(df_load_718, df_wind_718, df_solar_718, kd_tree_combined, k, run_time);
         current_point = [extract_first_point(df_load_718), extract_first_point(df_wind_718), extract_first_point(df_solar_718)]; # load, wind, solar
     
 

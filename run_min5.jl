@@ -30,6 +30,10 @@ end
 
 include("data_process_min5.jl")
 df_wind, df_solar, df_load = process_forecast_quantiles(df_wind, df_solar, df_load, df_wind_forecast_quantiles, df_solar_forecast_quantiles, df_load_forecast_quantiles, df_wind_forecast, df_solar_forecast, df_load_forecast)
+
+CSV.write("min5Data/df_wind_2019_historical_quantiles.csv", df_wind)
+CSV.write("min5Data/df_solar_2019_historical_quantiles.csv", df_solar)
+CSV.write("min5Data/df_load_2019_historical_quantiles.csv", df_load)
 # correction LocalDateTime
 df_wind.LocalDateTime = df_wind.DateTime .- Hour(4);
 df_solar.LocalDateTime = df_solar.DateTime .- Hour(4);
@@ -44,16 +48,22 @@ solar_event_quantile = read_event_quantiles_min(solar_fcst_file; issolar = true)
 load_event_quantile = read_event_quantiles_min(load_fcst_file)
 
 
-horizon = 48;
+horizon = 24;
 k = 10; # setting the number of nearest neighbors
 initial_time = Dates.DateTime(2019, 1, 1)
+i = 1
+run_time = initial_time + (i-1)*Minute(5)
+wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
+
 output_dir = "/Users/hanshu/Desktop/Price_formation/Data/generate_fr_KBoot/NYISO/Min5/"
 
 for i in 1:(8760*12-horizon+1)
     run_time = initial_time + (i-1)*Minute(5)
-    if i%100 == 0
-        @info "generate $run_time"
+    @info "generate data for $run_time"
+    if i > 200
+        break
     end
+    one_run_time = @elapsed begin
     wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     h5open(output_dir*"load_scenarios.h5", "cw") do file
@@ -67,5 +77,7 @@ for i in 1:(8760*12-horizon+1)
     h5open(output_dir*"wind_scenarios.h5", "cw") do file
         write(file, string(run_time), wind_scenarios_array)
     end
+end
+    @info "Time elapsed: $one_run_time seconds"
 end
 
