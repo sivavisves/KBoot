@@ -24,18 +24,22 @@ end
 function load_scenarios(file_path, DateTimeColumn)
     scenarios = []
     h5open(file_path, "r") do file
-        for scenario_name in keys(file)
+        keys_cache = collect(keys(file))  # Cache the keys to avoid repeated computation
+        for scenario_name in keys_cache
             scenario_group = file[scenario_name]
-            df = DataFrame()
+            data_cols = Dict{Symbol, Vector{Any}}()
             for dataset_name in keys(scenario_group)
                 dataset = read(scenario_group[dataset_name])
+                sym_name = Symbol(dataset_name)
                 if dataset_name == DateTimeColumn
-                    # Convert to DateTime
-                    df[!, dataset_name] = [DateTime(String(dt), "yyyy-mm-ddTHH:MM:SS") for dt in dataset]
+                    # Convert to DateTime in a more efficient way
+                    data_cols[sym_name] = DateTime.(string.(dataset), "yyyy-mm-ddTHH:MM:SS")
                 else
-                    df[!, dataset_name] = dataset
+                    data_cols[sym_name] = dataset
                 end
             end
+            # Construct DataFrame from dictionary
+            df = DataFrame(data_cols)
             push!(scenarios, df)
         end
     end
