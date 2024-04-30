@@ -38,9 +38,9 @@ module KBoot
 
         #filtering the data for a specific date.
         # filter 7/18 date from df_wind
-        df_wind_718 = filter_by_datetime_range(df_wind, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
-        df_solar_718 = filter_by_datetime_range(df_solar, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
-        df_load_718 = filter_by_datetime_range(df_load, :DateTimeTexas, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_wind_718 = filter_by_datetime_range(df_wind, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_solar_718 = filter_by_datetime_range(df_solar, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
+        df_load_718 = filter_by_datetime_range(df_load, :LocalDateTime, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon);
         
         current_point_variance, index_variance, distance_variance = knn_variance(df_load_718, df_wind_718, df_solar_718, kd_tree_variance, k, hour_of_interest);
         current_point_quantile, index_quantile, distance_quantile = knn_quantile(df_load_718, df_wind_718, df_solar_718, kd_tree_quantile, k, hour_of_interest);

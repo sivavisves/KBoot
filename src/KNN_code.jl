@@ -19,7 +19,7 @@ function data_prep_knn_combined(combined_set_quantile, combined_set_variance)
 end
 
 # extract hour 1
-filter_hour_df(df, hour) = filter(row -> Dates.hour(row[:DateTimeTexas]) == hour, df);
+filter_hour_df(df, hour) = filter(row -> Dates.hour(row[:LocalDateTime]) == hour, df);
 
 function knn_quantile(df_load_date, df_wind_date, df_solar_date, kd_tree_quantile, k, current_hour)
     current_point_quantile = [filter_hour_df(df_load_date, current_hour).quantile[1], filter_hour_df(df_wind_date, current_hour).quantile[1], filter_hour_df(df_solar_date, current_hour).quantile[1]] # load, wind, solar

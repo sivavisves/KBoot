@@ -1,9 +1,7 @@
 using DataFrames, Dates
 
 function block_disection(df_set::DataFrame, current_hour::Int, block_size::Int)
-    # Convert the DateTimeTexas column to a DateTime object
-    #df_set[!, :DateTimeObj] = DateTime.(df_set[!, :DateTimeTexas], "yyyy-mm-ddTHH:MM:SS.sss")
-    df_set[!, :extracted_hour] = hour.(df_set[!, :DateTimeTexas])
+    df_set[!, :extracted_hour] = hour.(df_set[!, :LocalDateTime])
 
     # Find the index of the first occurrence of current_hour in the dataset
     start_index = findfirst(isequal(current_hour), df_set[!, :extracted_hour])
@@ -118,11 +116,11 @@ end
 
 
 function get_actual_scenarios(scenarios, event_quantile, current_hour)
-    actual_scenarios = DataFrame(DateTimeTexas = DateTime[], block = Int64[], BA_total = Float64[])
+    actual_scenarios = DataFrame(LocalDateTime = DateTime[], block = Int64[], BA_total = Float64[])
     hour_set = current_hour
     for i in 1:length(scenarios)
         for j in 1:length(scenarios[i].quantile)
-            push!(actual_scenarios, [scenarios[i].DateTimeTexas[j] i determine_actual_value(event_quantile[!, Symbol("h"*string(hour_set))], scenarios[i].quantile[j])])
+            push!(actual_scenarios, [scenarios[i].LocalDateTime[j] i determine_actual_value(event_quantile[!, Symbol("h"*string(hour_set))], scenarios[i].quantile[j])])
             hour_set += 1
         end
         hour_set = current_hour

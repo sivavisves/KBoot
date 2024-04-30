@@ -3,30 +3,30 @@ using Test
 using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, Dates, NearestNeighbors, Statistics, TimeZones, HDF5
 
 
-@testset "KBoot.jl" begin
+@time @testset "KBoot.jl" begin
 
     file_wind = "../test/wind_scenario_blocks_hour_0_test.h5"
     file_solar = "../test/solar_scenario_blocks_hour_0_test.h5"
     file_load = "../test/load_scenario_blocks_hour_0_test.h5"
 
-    wind_scenario_test = load_scenarios(file_wind, "DateTimeTexas")
-    solar_scenario_test = load_scenarios(file_solar, "DateTimeTexas")
-    load_scenario_test = load_scenarios(file_load, "DateTimeTexas")
+    wind_scenario_test = load_scenarios(file_wind, "LocalDateTime")
+    solar_scenario_test = load_scenarios(file_solar, "LocalDateTime")
+    load_scenario_test = load_scenarios(file_load, "LocalDateTime")
 
     # load historical quantiles
     df_wind = CSV.read("../Historical Quantiles/df_wind_2018_historical_quantiles.csv", DataFrame);
     df_solar = CSV.read("../Historical Quantiles/df_solar_2018_historical_quantiles.csv", DataFrame);
     df_load = CSV.read("../Historical Quantiles/df_load_2018_historical_quantiles.csv", DataFrame);
     
-    # correction DateTimeTexas
-    df_wind.DateTimeTexas = df_wind.DateTime .- Hour(6);
-    df_solar.DateTimeTexas = df_solar.DateTime .- Hour(6);
-    df_load.DateTimeTexas = df_load.DateTime .- Hour(6);
+    # correction LocalDateTime
+    df_wind.LocalDateTime= df_wind.DateTime .- Hour(6);
+    df_solar.LocalDateTime = df_solar.DateTime .- Hour(6);
+    df_load.LocalDateTime = df_load.DateTime .- Hour(6);
 
     # correcting extracted_hour
-    df_wind.extracted_hour = hour.(df_wind.DateTimeTexas);
-    df_solar.extracted_hour = hour.(df_solar.DateTimeTexas);
-    df_load.extracted_hour = hour.(df_load.DateTimeTexas);
+    df_wind.extracted_hour = hour.(df_wind.LocalDateTime);
+    df_solar.extracted_hour = hour.(df_solar.LocalDateTime);
+    df_load.extracted_hour = hour.(df_load.LocalDateTime);
 
     # load quantile data
     wind_event_quantile = CSV.read("../Quantiles/Wind Quantiles.csv", DataFrame);
@@ -50,7 +50,7 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
     file_solar = "../test/solar_scenario_blocks_hour_0.h5"
     file_load = "../test/load_scenario_blocks_hour_0.h5"
 
-    @test wind_scenario = load_scenarios(file_wind, "DateTimeTexas") == wind_scenario_test
-    @test solar_scenario = load_scenarios(file_solar, "DateTimeTexas") == solar_scenario_test
-    @test load_scenario = load_scenarios(file_load, "DateTimeTexas") == load_scenario_test
+    @test wind_scenario = load_scenarios(file_wind, "LocalDateTime") == wind_scenario_test
+    @test solar_scenario = load_scenarios(file_solar, "LocalDateTime") == solar_scenario_test
+    @test load_scenario = load_scenarios(file_load, "LocalDateTime") == load_scenario_test
 end

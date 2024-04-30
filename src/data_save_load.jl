@@ -12,7 +12,7 @@ function data_to_hdf5(name::String, df::Vector{Any})
             # Convert DataFrame to a format suitable for HDF5 storage
             for colname in names(df)
                 coldata = df[!, colname]
-                if colname == "DateTimeTexas"  # Assuming this is your datetime column
+                if colname == "LocalDateTime"  # Assuming this is your datetime column
                     coldata = string.(coldata)  # Convert datetime to string for storage
                 end
                 g[colname] = coldata
