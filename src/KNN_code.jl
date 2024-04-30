@@ -19,8 +19,9 @@ function data_prep_knn_combined(combined_set_quantile, combined_set_variance)
 end
 
 # extract hour 1
-filter_time_df(df, run_time) = filter(row -> 
-    Dates.hour(row[:LocalDateTime]) == hour(run_time) && Dates.minute(row[:LocalDateTime]) == minute(run_time), df);
+# filter_time_df(df, run_time) = filter(row -> 
+#     Dates.hour(row[:LocalDateTime]) == hour(run_time) && Dates.minute(row[:LocalDateTime]) == minute(run_time), df);
+filter_time_df(df, run_time) = filter(row -> row[:LocalDateTime] == run_time, df);
 
 function knn_quantile(df_load_date, df_wind_date, df_solar_date, kd_tree_quantile, k, current_time)
     current_point_quantile = [filter_time_df(df_load_date, current_time).quantile[1], filter_time_df(df_wind_date, current_time).quantile[1], filter_time_df(df_solar_date, current_time).quantile[1]] # load, wind, solar

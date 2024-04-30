@@ -35,11 +35,26 @@ function  read_forecast_quantiles_min5(filename::AbstractString; issolar::Bool=f
     end
     issue_times = [DateTime(dt_str, date_time_format) for dt_str in forecast["issue_time"]]
     matrix = forecast["forecasts"][:, 2:2:end]
-    matrix = repeat(matrix, inner=(1,3))
+    matrix = interpolate_matrix(matrix)
     df = DataFrame(transpose(matrix), header)
     df.datetime = range(DateTime(2019, 1, 1, 0, 0, 0), stop = DateTime(2019, 12, 31, 23, 55, 0), step = Minute(5))
     df.datetime_issue = repeat([issue_times[2*i] for i in 1:35040], inner = 3)
     return df
+end
+
+function interpolate_matrix(matrix)
+    num_row = size(matrix, 1)
+    num_col = size(matrix, 2)
+    interpolated_matrix = zeros(num_row, 3*num_col)
+    for i in 1:num_col-1
+        interpolated_matrix[:, 3*(i-1)+1] = matrix[:, i]
+        interpolated_matrix[:, 3*(i-1)+2] = matrix[:, i]*2/3 + matrix[:, i+1]./3
+        interpolated_matrix[:, 3*(i-1)+3] = matrix[:, i]./3 + matrix[:, i+1].*2/3
+    end
+    interpolated_matrix[:, 3*(num_col-1)+1] = matrix[:, num_col]
+    interpolated_matrix[:, 3*(num_col-1)+2] = matrix[:, num_col]
+    interpolated_matrix[:, 3*(num_col-1)+3] = matrix[:, num_col]
+    return interpolated_matrix
 end
 
 function  read_forecast_hour_min(filename::AbstractString; issolar = false)::DataFrame
@@ -53,7 +68,8 @@ function  read_forecast_hour_min(filename::AbstractString; issolar = false)::Dat
     formatted_header = [Dates.format(dt, "yyyy-mm-dd HH:MM:SS") for dt in header]
     # header = [forecast["forecast_time"][2*i] for i in 1:35040]
     matrix = forecast["forecasts"][:, 2:2:end]
-    matrix = repeat(matrix, inner=(1,3))
+    # matrix = repeat(matrix, inner=(1,3))
+    matrix = interpolate_matrix(matrix)
     df = DataFrame(matrix, formatted_header)
     return df
 end
@@ -76,8 +92,6 @@ df_load = read_actuals_min5(load_actual_file; isload = true)
 df_wind_forecast_quantiles = read_forecast_quantiles_min5(wind_fcst_file)
 df_solar_forecast_quantiles = read_forecast_quantiles_min5(solar_fcst_file; issolar = true)
 df_load_forecast_quantiles = read_forecast_quantiles_min5(load_fcst_file)
-
-
 
 #---------------------------Preprocessing---------------------------#
 x = df_wind_forecast_quantiles.datetime .- Hour(4);
