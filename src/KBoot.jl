@@ -16,10 +16,6 @@ module KBoot
 
         #---------------------------------KNN---------------------------------#
         # Data Prep for knn
-        kd_tree_quantile = data_prep_knn_quantile(hour_1_load_quantile, hour_1_wind_quantile, hour_1_solar_quantile);
-
-        kd_tree_variance = data_prep_knn_variance(hour_1_load_variance, hour_1_wind_variance, hour_1_solar_variance);
-
         kd_tree_combined = data_prep_knn_combined([hour_1_load_quantile hour_1_wind_quantile hour_1_solar_quantile], [hour_1_load_variance hour_1_wind_variance hour_1_solar_variance]);
 
         #filtering the data for a specific date.
