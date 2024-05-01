@@ -1,6 +1,6 @@
 using KBoot
-using Test
 using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, Dates, NearestNeighbors, Statistics, TimeZones, HDF5
+using Base.Threads: @threads, ReentrantLock
 
 
 function quantile_data_prep(df)
@@ -42,13 +42,15 @@ wind_event_quantile = CSV.read("./Long term study/Data File/wind_forecast_conver
 solar_event_quantile = CSV.read("./Long term study/Data File/solar_forecast_conversion.csv", DataFrame);
 load_event_quantile = CSV.read("./Long term study/Data File/load_forecast_conversion.csv", DataFrame);
 
-wind_quantile = quantile_data_prep(wind_event_quantile)
-solar_quantile = quantile_data_prep(solar_event_quantile)
-load_quantile = quantile_data_prep(load_event_quantile)
+# wind_quantile = quantile_data_prep(wind_event_quantile)
+# solar_quantile = quantile_data_prep(solar_event_quantile)
+# load_quantile = quantile_data_prep(load_event_quantile)
 
 hour_of_interest = 0;
 horizon = 48;
 k = 10;
+
+# Single threaded version
 
 output_dir = "./Long term study/Scenario Data/"
 
@@ -59,7 +61,7 @@ output_dir = "./Long term study/Scenario Data/"
     day_of_interest = Dates.day(run_time)
     hour_of_interest = Dates.hour(run_time)
     year_of_interest = Dates.year(run_time)
-    wind_plot1, solar_plot1, load_plot1, q_knn1, v_knn1, wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_quantile, solar_quantile, load_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, i-1);
+    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, i-1);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     h5open(output_dir*"load_scenarios.h5", "cw") do file
         write(file, string(run_time), load_scenarios_array)
@@ -75,4 +77,45 @@ output_dir = "./Long term study/Scenario Data/"
     println("Hour $i done")
 end
 
-  
+
+# Multi threading version
+
+const load_output_file = "load_scenarios_multi.h5"
+const solar_output_file = "solar_scenarios_multi.h5"
+const wind_output_file = "wind_scenarios_multi.h5"
+const file_lock = ReentrantLock()
+
+@time Threads.@threads for i in 1:(8760-horizon+1)
+    initial_time = Dates.DateTime(2018, 1, 1)
+    run_time = initial_time + Hour(i - 1)
+    month_of_interest = Dates.month(run_time)
+    day_of_interest = Dates.day(run_time)
+    hour_of_interest = Dates.hour(run_time)
+    year_of_interest = Dates.year(run_time)
+
+    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, i-1)
+
+    load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
+    solar_scenarios_array = covert2array(solar_scenario_blocks_final_variance1)
+    wind_scenarios_array = covert2array(wind_scenario_blocks_final_variance1)
+
+    # Serialize file writes with a lock
+    lock(file_lock) do
+        h5open(load_output_file, "cw") do file
+            write(file, "load_$run_time", load_scenarios_array)
+        end
+        println("Load data for Hour $i written.")
+
+        h5open(solar_output_file, "cw") do file
+            write(file, "solar_$run_time", solar_scenarios_array)
+        end
+        println("Solar data for Hour $i written.")
+
+        h5open(wind_output_file, "cw") do file
+            write(file, "wind_$run_time", wind_scenarios_array)
+        end
+        println("Wind data for Hour $i written.")
+    end
+end
+
+
