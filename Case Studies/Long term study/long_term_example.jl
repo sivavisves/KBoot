@@ -46,7 +46,7 @@ load_event_quantile = CSV.read("Case Studies/Long term study/Data File/load_fore
 # solar_quantile = quantile_data_prep(solar_event_quantile)
 # load_quantile = quantile_data_prep(load_event_quantile)
 
-hour_of_interest = 0;
+
 horizon = 48;
 k = 10;
 
@@ -84,12 +84,8 @@ const file_lock = ReentrantLock()
 @time Threads.@threads for i in 1:(8760-horizon+1)
     initial_time = Dates.DateTime(2017, 12, 31, 18)
     run_time = initial_time + Hour(i - 1)
-    month_of_interest = Dates.month(run_time)
-    day_of_interest = Dates.day(run_time)
-    hour_of_interest = Dates.hour(run_time)
-    year_of_interest = Dates.year(run_time)
 
-    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, i-1)
+    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
 
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     solar_scenarios_array = covert2array(solar_scenario_blocks_final_variance1)
