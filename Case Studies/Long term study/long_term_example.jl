@@ -38,9 +38,9 @@ df_solar.extracted_hour = hour.(df_solar.LocalDateTime);
 df_load.extracted_hour = hour.(df_load.LocalDateTime);
 
 # load quantile data
-wind_event_quantile = CSV.read("./Long term study/Data File/wind_forecast_conversion.csv", DataFrame);
-solar_event_quantile = CSV.read("./Long term study/Data File/solar_forecast_conversion.csv", DataFrame);
-load_event_quantile = CSV.read("./Long term study/Data File/load_forecast_conversion.csv", DataFrame);
+wind_event_quantile = CSV.read("Case Studies/Long term study/Data File/wind_forecast_conversion.csv", DataFrame);
+solar_event_quantile = CSV.read("Case Studies/Long term study/Data File/solar_forecast_conversion.csv", DataFrame);
+load_event_quantile = CSV.read("Case Studies/Long term study/Data File/load_forecast_conversion.csv", DataFrame);
 
 # wind_quantile = quantile_data_prep(wind_event_quantile)
 # solar_quantile = quantile_data_prep(solar_event_quantile)
@@ -52,16 +52,12 @@ k = 10;
 
 # Single threaded version
 
-output_dir = "./Long term study/Scenario Data/"
+output_dir = "./Long term study/Scenario Data/";
 
 @time for i in 1:(8760-horizon+1)
-    initial_time = Dates.DateTime(2018, 1, 1)
+    initial_time = Dates.DateTime(2017, 12, 31, 18)
     run_time = initial_time + Hour(i - 1)
-    month_of_interest = Dates.month(run_time)
-    day_of_interest = Dates.day(run_time)
-    hour_of_interest = Dates.hour(run_time)
-    year_of_interest = Dates.year(run_time)
-    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon, k, i-1);
+    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
     h5open(output_dir*"load_scenarios.h5", "cw") do file
         write(file, string(run_time), load_scenarios_array)
@@ -86,7 +82,7 @@ const wind_output_file = "wind_scenarios_multi.h5"
 const file_lock = ReentrantLock()
 
 @time Threads.@threads for i in 1:(8760-horizon+1)
-    initial_time = Dates.DateTime(2018, 1, 1)
+    initial_time = Dates.DateTime(2017, 12, 31, 18)
     run_time = initial_time + Hour(i - 1)
     month_of_interest = Dates.month(run_time)
     day_of_interest = Dates.day(run_time)
@@ -117,5 +113,3 @@ const file_lock = ReentrantLock()
         println("Wind data for Hour $i written.")
     end
 end
-
-
