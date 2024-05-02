@@ -130,7 +130,8 @@ function get_actual_scenarios(scenarios, event_quantile, run_time, minute_set)
     run_time_loop = run_time
     for i in 1:length(scenarios)
         for j in 1:length(scenarios[i].quantile)
-            push!(actual_scenarios, [scenarios[i].LocalDateTime[j] i determine_actual_value(event_quantile[!, Symbol(run_time_loop)], scenarios[i].quantile[j])])
+            quantile_values = Vector{Float64}(event_quantile[!, Symbol(run_time_loop)])  # Convert column to Vector
+            push!(actual_scenarios, [scenarios[i].LocalDateTime[j], i, determine_actual_value(quantile_values, scenarios[i].quantile[j])])
             if minute_set == 0
                 run_time_loop += Dates.Hour(1)
             else
