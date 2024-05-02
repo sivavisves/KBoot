@@ -1,16 +1,26 @@
 using DataFrames, Dates
 
-function block_disection(df_set::DataFrame, current_hour::Int, block_size::Int)
+function block_disection(df_set::DataFrame, current_hour::Int, current_min::Int, block_size::Int, minute_set)
+
     df_set[!, :extracted_hour] = hour.(df_set[!, :LocalDateTime])
 
-    # Find the index of the first occurrence of current_hour in the dataset
-    start_index = findfirst(isequal(current_hour), df_set[!, :extracted_hour])
+    if minute_set == 0
+        start_index = findfirst(isequal(current_hour), df_set[!, :extracted_hour])
+    end
+
+    start_index = findfirst(dt -> (hour(dt) == current_hour && minute(dt) == current_min), df_set[!, :LocalDateTime])
+
     if isnothing(start_index)  # If the current_hour is not found in the dataset, return an empty array
+        @error "The time index is not found in the dataset"
         return []
     end
 
     # Extract blocks starting from the start_index
-    stride = 24
+    if minute_set == 0
+        stride = 24
+    else
+        stride = 24*12
+    end
     blocks = []
     idx = start_index
 
@@ -115,15 +125,19 @@ function determine_actual_value(marginals::Vector{Float64}, quantile_value::Floa
 end
 
 
-function get_actual_scenarios(scenarios, event_quantile, current_hour)
+function get_actual_scenarios(scenarios, event_quantile, run_time, minute_set)
     actual_scenarios = DataFrame(LocalDateTime = DateTime[], block = Int64[], BA_total = Float64[])
-    hour_set = current_hour
+    run_time_loop = run_time
     for i in 1:length(scenarios)
         for j in 1:length(scenarios[i].quantile)
-            push!(actual_scenarios, [scenarios[i].LocalDateTime[j] i determine_actual_value(event_quantile[!, Symbol("h"*string(hour_set))], scenarios[i].quantile[j])])
-            hour_set += 1
+            push!(actual_scenarios, [scenarios[i].LocalDateTime[j] i determine_actual_value(event_quantile[!, Symbol(run_time_loop)], scenarios[i].quantile[j])])
+            if minute_set == 0
+                run_time_loop += Dates.Hour(1)
+            else
+                run_time_loop += Dates.Minute(5)
+            end
         end
-        hour_set = current_hour
+        run_time_loop = run_time
     end
     return actual_scenarios
 end

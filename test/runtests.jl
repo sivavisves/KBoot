@@ -29,9 +29,9 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
     df_load.extracted_hour = hour.(df_load.LocalDateTime);
 
     # load quantile data
-    wind_event_quantile = CSV.read("../Quantiles/Wind Quantiles.csv", DataFrame);
-    solar_event_quantile = CSV.read("../Quantiles/Solar Quantiles.csv", DataFrame);
-    load_event_quantile = CSV.read("../Quantiles/Load Quantiles.csv", DataFrame);
+    wind_event_quantile = CSV.read("../Quantiles/wind_forecast_conversion.csv", DataFrame);
+    solar_event_quantile = CSV.read("../Quantiles/solar_forecast_conversion.csv", DataFrame);
+    load_event_quantile = CSV.read("../Quantiles/load_forecast_conversion.csv", DataFrame);
 
     hour_of_interest = 0;
     horizon = 47;
@@ -40,7 +40,9 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
     day_of_interest = 18;
     year_of_interest = 2018;
 
-    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, year_of_interest, month_of_interest, day_of_interest, hour_of_interest, horizon,  k, hour_of_interest);
+    run_time = Dates.DateTime(year_of_interest, month_of_interest, day_of_interest, hour_of_interest, 0);
+
+    wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
 
     data_to_hdf5("../test/wind_scenario_blocks_hour_$hour_of_interest", wind_scenario_blocks_final_variance1)
     data_to_hdf5("../test/solar_scenario_blocks_hour_$hour_of_interest", solar_scenario_blocks_final_variance1)
