@@ -38,9 +38,9 @@ df_solar.extracted_hour = hour.(df_solar.LocalDateTime);
 df_load.extracted_hour = hour.(df_load.LocalDateTime);
 
 # load quantile data
-wind_event_quantile = CSV.read("Case Studies/Long term study/Data File/wind_forecast_conversion.csv", DataFrame);
-solar_event_quantile = CSV.read("Case Studies/Long term study/Data File/solar_forecast_conversion.csv", DataFrame);
-load_event_quantile = CSV.read("Case Studies/Long term study/Data File/load_forecast_conversion.csv", DataFrame);
+wind_event_quantile = CSV.read("Case Studies/Long term study/Data File/wind_forecast_conversion_clean.csv", DataFrame);
+solar_event_quantile = CSV.read("Case Studies/Long term study/Data File/solar_forecast_conversion_clean.csv", DataFrame);
+load_event_quantile = CSV.read("Case Studies/Long term study/Data File/load_forecast_conversion_clean.csv", DataFrame);
 
 # wind_quantile = quantile_data_prep(wind_event_quantile)
 # solar_quantile = quantile_data_prep(solar_event_quantile)
@@ -76,9 +76,9 @@ end
 
 # Multi threading version
 
-const load_output_file = "load_scenarios_multi.h5"
-const solar_output_file = "solar_scenarios_multi.h5"
-const wind_output_file = "wind_scenarios_multi.h5"
+const load_output_file = "Case Studies/Long term study/Scenario Data/load_scenarios_multi.h5"
+const solar_output_file = "Case Studies/Long term study/Scenario Data/solar_scenarios_multi.h5"
+const wind_output_file = "Case Studies/Long term study/Scenario Data/wind_scenarios_multi.h5"
 const file_lock = ReentrantLock()
 
 @time Threads.@threads for i in 1:(8760-horizon+1)
@@ -96,16 +96,14 @@ const file_lock = ReentrantLock()
         h5open(load_output_file, "cw") do file
             write(file, "load_$run_time", load_scenarios_array)
         end
-        println("Load data for Hour $i written.")
 
         h5open(solar_output_file, "cw") do file
             write(file, "solar_$run_time", solar_scenarios_array)
         end
-        println("Solar data for Hour $i written.")
 
         h5open(wind_output_file, "cw") do file
             write(file, "wind_$run_time", wind_scenarios_array)
         end
-        println("Wind data for Hour $i written.")
+        println("$run_time done")
     end
 end

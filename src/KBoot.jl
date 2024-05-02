@@ -4,7 +4,7 @@ module KBoot
 
     export scenario_generation
 
-    function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon::Int64, k::Int64; minute_set::Int=0)
+    function scenario_generation(df_wind, df_solar, df_load, wind_event_quantile_clean, solar_event_quantile_clean, load_event_quantile_clean, run_time, horizon::Int64, k::Int64; minute_set::Int=0)
         year_of_interest = Dates.year(run_time)
         month_of_interest = Dates.month(run_time)
         day_of_interest = Dates.day(run_time)
@@ -39,10 +39,6 @@ module KBoot
         load_scenario_combined = get_blocks(index_combined, blocks_load_train);
 
         #---------------------------------Quantile data---------------------------------#
-
-        wind_event_quantile_clean = event_quantile_clean(wind_event_quantile);
-        solar_event_quantile_clean = event_quantile_clean(solar_event_quantile);
-        load_event_quantile_clean = event_quantile_clean(load_event_quantile);
 
         actual_wind_scenarios_combined = get_actual_scenarios(wind_scenario_combined, wind_event_quantile_clean, run_time, minute_set);
         actual_solar_scenarios_combined = get_actual_scenarios(solar_scenario_combined, solar_event_quantile_clean, run_time, minute_set);

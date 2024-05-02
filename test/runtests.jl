@@ -29,9 +29,9 @@ using CSV, DataFrames, Plots, StatsPlots, Distributions, Random, KernelDensity, 
     df_load.extracted_hour = hour.(df_load.LocalDateTime);
 
     # load quantile data
-    wind_event_quantile = CSV.read("../Quantiles/wind_forecast_conversion.csv", DataFrame);
-    solar_event_quantile = CSV.read("../Quantiles/solar_forecast_conversion.csv", DataFrame);
-    load_event_quantile = CSV.read("../Quantiles/load_forecast_conversion.csv", DataFrame);
+    wind_event_quantile = CSV.read("../Quantiles/wind_forecast_conversion_clean.csv", DataFrame);
+    solar_event_quantile = CSV.read("../Quantiles/solar_forecast_conversion_clean.csv", DataFrame);
+    load_event_quantile = CSV.read("../Quantiles/load_forecast_conversion_clean.csv", DataFrame);
 
     hour_of_interest = 0;
     horizon = 47;
