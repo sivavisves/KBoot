@@ -55,10 +55,15 @@ k = 10;
 output_dir = "./Long term study/Scenario Data/";
 
 @time for i in 1:(8760-horizon+1)
+
     initial_time = Dates.DateTime(2017, 12, 31, 18)
     run_time = initial_time + Hour(i - 1)
     wind_scenario_blocks_final_variance1, solar_scenario_blocks_final_variance1, load_scenario_blocks_final_variance1 = scenario_generation(df_wind, df_solar, df_load, wind_event_quantile, solar_event_quantile, load_event_quantile, run_time, horizon, k);
     load_scenarios_array = covert2array(load_scenario_blocks_final_variance1)
+    solar_scenarios_array = covert2array(solar_scenario_blocks_final_variance1)
+    wind_scenarios_array = covert2array(wind_scenario_blocks_final_variance1)
+
+
     h5open(output_dir*"load_scenarios.h5", "cw") do file
         write(file, string(run_time), load_scenarios_array)
     end
