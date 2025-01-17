@@ -12,9 +12,9 @@ module KBoot
         minute_of_interest = Dates.minute(run_time)
     
         # Data cleaning and processing phase
-        hour_1_wind_variance, blocks_wind_train, blocks_wind_test= process_energy_data_variance(df_wind, hour_of_interest, minute_of_interest, horizon, minute_set)
-        hour_1_solar_variance, blocks_solar_train, blocks_solar_test = process_energy_data_variance(df_solar, hour_of_interest, minute_of_interest, horizon, minute_set)
-        hour_1_load_variance, blocks_load_train, blocks_load_test = process_energy_data_variance(df_load, hour_of_interest, minute_of_interest, horizon, minute_set)
+        hour_1_wind_variance, blocks_wind_train = process_energy_data_variance(df_wind, hour_of_interest, minute_of_interest, horizon, minute_set)
+        hour_1_solar_variance, blocks_solar_train = process_energy_data_variance(df_solar, hour_of_interest, minute_of_interest, horizon, minute_set)
+        hour_1_load_variance, blocks_load_train = process_energy_data_variance(df_load, hour_of_interest, minute_of_interest, horizon, minute_set)
     
         hour_1_wind_quantile = process_energy_data_quantile(df_wind, hour_of_interest, minute_of_interest, horizon, minute_set);
         hour_1_solar_quantile = process_energy_data_quantile(df_solar, hour_of_interest, minute_of_interest, horizon, minute_set);

@@ -116,7 +116,7 @@ function determine_actual_value(marginals::Vector{Float64}, quantile_value::Floa
         quantile_lower = 0.01 + (i-1)*0.01
         quantile_upper = 0.01 + i*0.01
 
-        if quantile_lower <= quantile_value <= quantile_upper
+        if (quantile_lower <= quantile_value) && (quantile_value <= quantile_upper)
             # Linear interpolation
             weight = (quantile_value - quantile_lower) / (quantile_upper - quantile_lower)
             return marginals[i] + weight * (marginals[i+1] - marginals[i])

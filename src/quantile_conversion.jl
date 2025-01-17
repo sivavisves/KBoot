@@ -14,7 +14,7 @@ function within_quantile_check(df, lower, upper)
     return df_quantile_array
 end
 
-function determine_quantile(marginals::Vector{Float64}, actual_value::Float64)
+function determine_quantile(marginals, actual_value::Float64)
     # If actual value is below the minimum or above the maximum of the marginals
     if actual_value <= marginals[1]
         dif_marginals = marginals[2] - marginals[1]
@@ -34,24 +34,24 @@ function determine_quantile(marginals::Vector{Float64}, actual_value::Float64)
         else
             return final_q
         end
-    end
-
-    # If the value is within the range of the marginals
-    for i in 1:(length(marginals)-1)
-        if marginals[i] <= actual_value <= marginals[i+1]
-            # Linear interpolation
-            quantile_lower = 0.01 + (i-1)*0.01
-            quantile_upper = 0.01 + i*0.01
-            weight = (actual_value - marginals[i]) / (marginals[i+1] - marginals[i])
-            return quantile_lower + weight * (quantile_upper - quantile_lower)
+    else
+        # If the value is within the range of the marginals
+        for i in 1:(length(marginals)-1)
+            if marginals[i] <= actual_value && actual_value <= marginals[i+1]
+                # Linear interpolation
+                quantile_lower = 0.01 + (i-1)*0.01
+                quantile_upper = 0.01 + i*0.01
+                weight = (actual_value - marginals[i]) / (marginals[i+1] - marginals[i])
+                return quantile_lower + weight * (quantile_upper - quantile_lower)
+            end
         end
     end
 end
 
 function quantile_interpolation(df_forecast, actuals)
-    test_x = zeros(8760)
-    for i in 1:8760
-        test_x[i] = determine_quantile(Float64.(df_forecast[!, Symbol("h"*string(i))]), actuals[i, :BA_total])
+    test_x = zeros(size(df_forecast)[2])
+    for i in 1:size(df_forecast)[2]
+        test_x[i] = determine_quantile(Float64.(df_forecast[!, i]), actuals[i, :BA_total])
     end
     return test_x
 end
@@ -89,9 +89,9 @@ function process_forecast_quantiles(df_wind, df_solar, df_load, df_wind_forecast
     df_solar_copy[!, :quantile] = df_solar_converted_historical
     df_load_copy[!, :quantile] = df_load_converted_historical
 
-    variance_load = compute_variance(df_load_forecast);
-    variance_solar = compute_variance(df_solar_forecast);
-    variance_wind = compute_variance(df_wind_forecast);
+    variance_load = compute_sample_variance(df_load_forecast);
+    variance_solar = compute_sample_variance(df_solar_forecast);
+    variance_wind = compute_sample_variance(df_wind_forecast);
 
     # replace variance in df_wind to variance_wind
     df_wind_copy[!, :variance] = variance_wind;
@@ -106,10 +106,25 @@ function compute_variance(df::DataFrame)
     variances = zeros(num_columns)
 
     for i in 1:num_columns
-        kde_fit = kde(df[!, Symbol("h"*string(i))])
+        kde_fit = kde(df[! , i])
         E_X = sum(kde_fit.x .* kde_fit.density) * step(kde_fit.x)
         E_X2 = sum(kde_fit.x .^ 2 .* kde_fit.density) * step(kde_fit.x)
         variance = E_X2 - E_X^2
+        variances[i] = variance
+    end
+
+    return variances
+end
+
+function compute_sample_variance(df::DataFrame)
+    num_columns = size(df, 2)
+    variances = zeros(num_columns)
+
+    for i in 1:num_columns
+        column_data = df[!, i]  # Extract the column
+        n = length(column_data)
+        mean_value = mean(column_data)  # Calculate the mean
+        variance = sum((column_data .- mean_value).^2) / (n - 1)  # Sample variance
         variances[i] = variance
     end
 
